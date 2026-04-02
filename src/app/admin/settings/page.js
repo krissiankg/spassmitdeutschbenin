@@ -36,19 +36,6 @@ export default function SettingsPage() {
   
   const [loading, setLoading] = useState(false);
 
-  // Load Initial Data
-  useEffect(() => {
-    if (session?.user) {
-      setProfileForm(f => ({ ...f, name: session.user.name, email: session.user.email }));
-    }
-    if (isAdmin) {
-       loadUsers();
-       loadPricings();
-       loadAuditLogs();
-    }
-    loadSessions();
-  }, [session, isAdmin, auditPage, auditLimit, auditActionFilter, loadUsers, loadPricings, loadAuditLogs, loadSessions]);
-
   const loadUsers = React.useCallback(async () => {
     try {
       const res = await fetch("/api/admin/users");
@@ -83,6 +70,19 @@ export default function SettingsPage() {
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   }, [isAdmin, auditPage, auditLimit, auditActionFilter]);
+
+  // Load Initial Data
+  useEffect(() => {
+    if (session?.user) {
+      setProfileForm(f => ({ ...f, name: session.user.name, email: session.user.email }));
+    }
+    if (isAdmin) {
+       loadUsers();
+       loadPricings();
+       loadAuditLogs();
+    }
+    loadSessions();
+  }, [session, isAdmin, auditPage, auditLimit, auditActionFilter, loadUsers, loadPricings, loadAuditLogs, loadSessions]);
 
   const handleCleanupLogs = async () => {
     const months = 2;
