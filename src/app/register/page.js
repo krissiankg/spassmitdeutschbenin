@@ -163,10 +163,10 @@ export default function RegisterPage() {
              <h3 className="font-bold text-amber-800 text-lg mb-2">Montant à régler : {totalPrice.toLocaleString()} FCFA</h3>
              <p className="text-sm text-amber-700">
                Veuillez passer au secrétariat dans le plus bref délai pour payer et solder votre inscription. 
-               Votre dossier ne sera officiellement validé qu'après paiement.
+               Votre dossier ne sera officiellement validé qu&apos;après paiement.
              </p>
           </div>
-          <button onClick={() => window.location.href="/"} className="w-full bg-[#003366] text-white py-4 rounded-xl font-bold hover:bg-[#002244] transition-colors text-lg">Retour à l'accueil</button>
+          <button onClick={() => window.location.href="/"} className="w-full bg-[#003366] text-white py-4 rounded-xl font-bold hover:bg-[#002244] transition-colors text-lg">Retour à l&apos;accueil</button>
         </motion.div>
       </div>
     );
@@ -188,7 +188,7 @@ export default function RegisterPage() {
             {formSettings.closingMessage}
           </p>
           <Link href="/" className="inline-block bg-[#003366] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#002244] transition-colors">
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
         </div>
       </div>
@@ -204,7 +204,7 @@ export default function RegisterPage() {
             <img src="/logo.png" alt="Spass mit Deutsch Benin" className="h-20 mx-auto object-contain mb-8 hover:scale-105 transition-transform" />
           </Link>
           <h1 className="text-4xl font-extrabold text-[#003366] tracking-tight mb-3">Formulaire de préinscription ÖSD</h1>
-          <p className="text-gray-500 text-lg">Renseignez votre dossier et construisez votre panier d'examen.</p>
+          <p className="text-gray-500 text-lg">Renseignez votre dossier et construisez votre panier d&apos;examen.</p>
         </div>
 
         <motion.form 
@@ -256,7 +256,7 @@ export default function RegisterPage() {
 
           {/* SECTION 2: Pièce d'Identité */}
           <div className="space-y-6 pt-6 bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
-            <h3 className="text-lg font-bold text-[#003366] flex items-center gap-2 mb-4"><ShieldCheck className="text-[#D4AF37]" size={20}/> 2. Document d'Identité</h3>
+            <h3 className="text-lg font-bold text-[#003366] flex items-center gap-2 mb-4"><ShieldCheck className="text-[#D4AF37]" size={20}/> 2. Document d&apos;Identité</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-bold text-gray-600 mb-2">Nature de la pièce *</label>
@@ -273,11 +273,11 @@ export default function RegisterPage() {
                 <input type="date" required name="idIssueDate" value={formData.idIssueDate} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#003366] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-600 mb-2">Date d'expiration *</label>
+                <label className="block text-sm font-bold text-gray-600 mb-2">Date d&apos;expiration *</label>
                 <input type="date" required name="idExpiryDate" value={formData.idExpiryDate} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#003366] outline-none" />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-gray-600 mb-3">Scanner la Pièce d'Identité (Max 5Mo) *</label>
+                <label className="block text-sm font-bold text-gray-600 mb-3">Scanner la Pièce d&apos;Identité (Max 5Mo) *</label>
                 <div className={`border-2 border-dashed rounded-2xl p-6 text-center transition-colors ${file ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white hover:bg-gray-50 cursor-pointer'}`}>
                   <input required type="file" accept="image/jpeg, image/png, application/pdf" id="id-upload" className="hidden" onChange={handleFileChange} />
                   <label htmlFor="id-upload" className="cursor-pointer flex flex-col items-center justify-center">
@@ -326,12 +326,12 @@ export default function RegisterPage() {
 
           {/* SECTION 3: E-Commerce / Choix */}
           <div className="space-y-6 pt-6">
-            <h3 className="text-xl font-bold text-[#003366] flex items-center gap-2 border-b border-gray-100 pb-4"><Calendar className="text-[#D4AF37]" /> 3. Choix de l'Examen et Modules</h3>
+            <h3 className="text-xl font-bold text-[#003366] flex items-center gap-2 border-b border-gray-100 pb-4"><Calendar className="text-[#D4AF37]" /> 3. Choix de l&apos;Examen et Modules</h3>
             
             <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 mb-6">
               <label className="block text-sm font-bold text-[#003366] mb-3">Session Visée *</label>
               <select required name="sessionId" value={formData.sessionId} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#003366] outline-none shadow-sm">
-                <option value="">Sélectionnez une session d'examen disponible</option>
+                <option value="">Sélectionnez une session d&apos;examen disponible</option>
                 {sessions.map(s => <option key={s.id} value={s.id}>{s.title} ({s.level === 'MULTI' ? 'Multi-niveaux' : s.level})</option>)}
               </select>
             </div>
@@ -406,12 +406,12 @@ export default function RegisterPage() {
             <div className="flex items-center gap-3">
               <CreditCard size={32} className="text-[#D4AF37]" />
               <div>
-                <p className="text-sm text-blue-200 font-medium">Panier d'examen (Facture Totale)</p>
+                <p className="text-sm text-blue-200 font-medium">Panier d&apos;examen (Facture Totale)</p>
                 <p className="text-2xl font-black">{totalPrice.toLocaleString()} <span className="text-lg font-medium text-[#D4AF37]">FCFA</span></p>
               </div>
             </div>
             <p className="text-xs sm:text-sm text-blue-100 max-w-sm text-center sm:text-right opacity-80 leading-snug">
-              Cochez les niveaux, modules et cours pour voir le total s'ajuster en direct.
+              Cochez les niveaux, modules et cours pour voir le total s&apos;ajuster en direct.
             </p>
          </div>
       </div>

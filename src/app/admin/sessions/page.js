@@ -45,7 +45,7 @@ export default function SessionsPage() {
   });
 
   // Charger les sessions depuis l'API
-  const loadSessions = async () => {
+  const loadSessions = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/sessions");
@@ -66,11 +66,11 @@ export default function SessionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadSessions();
-  }, []);
+  }, [loadSessions]);
 
   const handleSubmitSession = async (e) => {
     e.preventDefault();
@@ -150,8 +150,8 @@ export default function SessionsPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#003366] dark:text-gray-100 ">Sessions d'Examen</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-500">Gérez les périodes d'examens et la publication des résultats.</p>
+          <h1 className="text-2xl font-bold text-[#003366] dark:text-gray-100 ">Sessions d&apos;Examen</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-500">Gérez les périodes d&apos;examens et la publication des résultats.</p>
         </div>
         <button 
           onClick={() => openAppModal()}
@@ -357,7 +357,7 @@ export default function SessionsPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">
-                    Date de l'examen
+                    Date de l&apos;examen
                   </label>
                   <input 
                     type="date"

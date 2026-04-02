@@ -43,7 +43,7 @@ export default function LoginPage() {
         className="absolute top-8 left-8 flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-[#003366] bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-md group"
       >
         <Home size={18} className="group-hover:scale-110 transition-transform" />
-        <span>Retour à l'accueil</span>
+        <span>Retour à l&apos;accueil</span>
       </Link>
 
       <div className="w-full max-w-md">

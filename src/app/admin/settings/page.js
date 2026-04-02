@@ -47,30 +47,30 @@ export default function SettingsPage() {
        loadAuditLogs();
     }
     loadSessions();
-  }, [session, isAdmin, auditPage, auditLimit, auditActionFilter]);
+  }, [session, isAdmin, auditPage, auditLimit, auditActionFilter, loadUsers, loadPricings, loadAuditLogs, loadSessions]);
 
-  const loadUsers = async () => {
+  const loadUsers = React.useCallback(async () => {
     try {
       const res = await fetch("/api/admin/users");
       if (res.ok) setUsers(await res.json());
     } catch (e) { console.error(e); }
-  };
+  }, []);
 
-  const loadSessions = async () => {
+  const loadSessions = React.useCallback(async () => {
     try {
       const res = await fetch("/api/admin/sessions");
       if (res.ok) setSessions(await res.json());
     } catch (e) { console.error(e); }
-  };
+  }, []);
 
-  const loadPricings = async () => {
+  const loadPricings = React.useCallback(async () => {
     try {
       const res = await fetch("/api/admin/pricing");
       if (res.ok) setPricings(await res.json());
     } catch (e) { console.error(e); }
-  };
+  }, []);
 
-  const loadAuditLogs = async () => {
+  const loadAuditLogs = React.useCallback(async () => {
     if (!isAdmin) return;
     setLoading(true);
     try {
@@ -82,7 +82,7 @@ export default function SettingsPage() {
       }
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
-  };
+  }, [isAdmin, auditPage, auditLimit, auditActionFilter]);
 
   const handleCleanupLogs = async () => {
     const months = 2;
@@ -282,7 +282,7 @@ export default function SettingsPage() {
             onClick={() => setActiveTab("communications")}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === "communications" ? "bg-[#003366] text-white shadow-lg shadow-blue-900/10" : "bg-white dark:bg-[#121212] text-gray-500 dark:text-gray-500 hover:bg-gray-50 dark:bg-[#1E1E1E]"}`}
           >
-            <Send size={18} /> Outils d'Envoi Mail
+            <Send size={18} /> Outils d&apos;Envoi Mail
           </button>
 
           {isAdmin && (
@@ -290,7 +290,7 @@ export default function SettingsPage() {
               onClick={() => setActiveTab("audit")}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === "audit" ? "bg-[#003366] text-white shadow-lg shadow-blue-900/10" : "bg-white dark:bg-[#121212] text-gray-500 dark:text-gray-500 hover:bg-gray-50 dark:bg-[#1E1E1E]"}`}
             >
-              <History size={18} /> Journal d'Audit
+              <History size={18} /> Journal d&apos;Audit
             </button>
           )}
         </div>
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">Sécurité du Compte</h2>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">Pour modifier votre mot de passe, l'ancien est requis.</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">Pour modifier votre mot de passe, l&apos;ancien est requis.</p>
                 </div>
               </div>
 
@@ -424,11 +424,11 @@ export default function SettingsPage() {
                       className="px-6 py-3 bg-[#003366] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#002244] transition-colors shadow-lg shadow-blue-900/10 whitespace-nowrap"
                     >
                       {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                      Déclencher l'Envoi
+                      Déclencher l&apos;Envoi
                     </button>
                   </div>
                   <p className="text-xs text-amber-600/70 mt-4 leading-relaxed">
-                    <strong>Attention :</strong> L'envoi va distribuer le code secret à TOUS les candidats enregistrés sur la session ayant fourni une adresse email valide ! Assurez-vous d'être prêt à distribuer les accès au portail web.
+                    <strong>Attention :</strong> L&apos;envoi va distribuer le code secret à TOUS les candidats enregistrés sur la session ayant fourni une adresse email valide ! Assurez-vous d&apos;être prêt à distribuer les accès au portail web.
                   </p>
                 </div>
 
@@ -438,7 +438,7 @@ export default function SettingsPage() {
                     Configuration Technique
                   </h4>
                   <p className="text-sm text-gray-500 mb-6">
-                    Vérifiez si votre serveur email (SMTP) est prêt à envoyer des messages vers l'extérieur.
+                    Vérifiez si votre serveur email (SMTP) est prêt à envoyer des messages vers l&apos;extérieur.
                   </p>
                   <button 
                     onClick={handleTestEmail}
@@ -456,7 +456,7 @@ export default function SettingsPage() {
             <div className="bg-white dark:bg-[#121212] rounded-3xl p-8 shadow-sm border border-gray-50 dark:border-gray-800/50 space-y-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">Journal d'Audit</h2>
+                  <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">Journal d&apos;Audit</h2>
                   <p className="text-sm text-gray-400 dark:text-gray-500">Traçabilité complète des actions administratives.</p>
                 </div>
                 <button 
@@ -470,7 +470,7 @@ export default function SettingsPage() {
               <div className="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/50 rounded-2xl p-4 flex items-start gap-3">
                 <ShieldAlert className="text-blue-600 shrink-0 mt-0.5" size={20} />
                 <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed font-medium">
-                  Les journaux d'audit sont conservés indéfiniment. 
+                  Les journaux d&apos;audit sont conservés indéfiniment. 
                   Il est recommandé de purger les logs de plus de 2 mois si la base de données devient volumineuse.
                 </p>
               </div>

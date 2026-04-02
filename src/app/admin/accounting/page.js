@@ -28,7 +28,7 @@ const CashierTab = () => {
   const [limit, setLimit] = useState(25);
   const [total, setTotal] = useState(0);
 
-  const loadCandidates = async () => {
+  const loadCandidates = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/accounting/cashier?search=${search}&page=${page}&limit=${limit}`);
@@ -39,16 +39,16 @@ const CashierTab = () => {
       }
     } catch (e) { toast.error("Erreur chargement candidats"); }
     finally { setLoading(false); }
-  };
+  }, [search, page, limit]);
 
   useEffect(() => {
     if (page !== 1) setPage(1);
     else loadCandidates();
-  }, [search, limit]);
+  }, [search, limit, page, loadCandidates]);
 
   useEffect(() => {
     loadCandidates();
-  }, [page]);
+  }, [page, loadCandidates]);
 
   const handleUpdateTotal = async (id) => {
     setLoading(true);
@@ -279,24 +279,24 @@ const CategoriesTab = () => {
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [pricingForm, setPricingForm] = useState({ code: "", category: "MODULE", label: "", price: 0, level: "" });
 
-  useEffect(() => {
-    loadCategories();
-    loadPricings();
-  }, []);
-
-  const loadCategories = async () => {
+  const loadCategories = React.useCallback(async () => {
     try {
       const res = await fetch("/api/admin/accounting/categories");
       if (res.ok) setCategories(await res.json());
     } catch (e) { toast.error("Erreur chargement catégories"); }
-  };
+  }, []);
 
-  const loadPricings = async () => {
+  const loadPricings = React.useCallback(async () => {
     try {
       const res = await fetch("/api/admin/pricing");
       if (res.ok) setPricings(await res.json());
     } catch (e) { toast.error("Erreur chargement tarifs"); }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadCategories();
+    loadPricings();
+  }, [loadCategories, loadPricings]);
 
   // Gestion Catégories
   const openCatModal = (cat = null) => {
@@ -447,7 +447,7 @@ const CategoriesTab = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">Grille Tarifaire (E-commerce & Standard)</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-500">Gérez les prix affichés sur le portail et modifiez leur catégorie d'appartenance.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-500">Gérez les prix affichés sur le portail et modifiez leur catégorie d&apos;appartenance.</p>
           </div>
           <button onClick={openPricingModal} className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/20 text-sm font-bold">
             <Plus size={18} /> Ajouter Tarif
@@ -460,7 +460,7 @@ const CategoriesTab = () => {
               <tr className="border-b border-gray-100 dark:border-gray-800 text-[10px] uppercase font-bold tracking-wider text-gray-500 dark:text-gray-500">
                 <th className="p-4">Identifiant Technique</th>
                 <th className="p-4">Catégorie</th>
-                <th className="p-4">Libellé d'affichage</th>
+                <th className="p-4">Libellé d&apos;affichage</th>
                 <th className="p-4 text-right">Prix (FCFA)</th>
                 <th className="p-4 text-right">Action</th>
               </tr>
@@ -489,7 +489,7 @@ const CategoriesTab = () => {
                         onChange={e => setPricings(pricings.map(x => x.id === p.id ? {...x, category: e.target.value} : x))}
                         className="w-full px-2 py-1.5 bg-white dark:bg-[#121212] border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-bold text-[#003366] dark:text-gray-100 focus:ring-1 outline-none mb-1"
                       >
-                        <option value="MODULE">Modules d'examen</option>
+                        <option value="MODULE">Modules d&apos;examen</option>
                         <option value="PREP_COURSE">Cours Préparatoires</option>
                         <option value="LEVEL">Niveau (Frais Généraux)</option>
                         {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -605,7 +605,7 @@ const CategoriesTab = () => {
                 <div>
                   <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Catégorie</label>
                   <select required value={pricingForm.category} onChange={e => setPricingForm({...pricingForm, category: e.target.value})} className="w-full px-4 py-3 bg-gray-50 dark:bg-[#1E1E1E] border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none">
-                    <option value="MODULE">Modules d'examen</option>
+                    <option value="MODULE">Modules d&apos;examen</option>
                     <option value="PREP_COURSE">Cours Préparatoires</option>
                     <option value="LEVEL">Niveau (Frais Généraux)</option>
                     {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -613,7 +613,7 @@ const CategoriesTab = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Libellé d'affichage</label>
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Libellé d&apos;affichage</label>
                   <input required type="text" placeholder="Ex: Frais de Bibliothèque" value={pricingForm.label} onChange={e => setPricingForm({...pricingForm, label: e.target.value})} className="w-full px-4 py-3 bg-gray-50 dark:bg-[#1E1E1E] border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none" />
                 </div>
 
@@ -630,7 +630,7 @@ const CategoriesTab = () => {
 
                 <div className="pt-4 flex justify-end gap-3">
                   <button type="button" onClick={() => setIsPricingModalOpen(false)} className="px-5 py-2.5 text-sm font-bold text-gray-500 dark:text-gray-500 bg-gray-50 dark:bg-[#1E1E1E] rounded-xl dark:hover:bg-gray-800 transition-colors">Annuler</button>
-                  <button type="submit" disabled={loading} className="px-5 py-2.5 text-sm font-bold text-white bg-amber-500 rounded-xl hover:bg-amber-600 shadow-lg shadow-amber-500/20">{loading ? "Enregistrement..." : "Créer l'article"}</button>
+                  <button type="submit" disabled={loading} className="px-5 py-2.5 text-sm font-bold text-white bg-amber-500 rounded-xl hover:bg-amber-600 shadow-lg shadow-amber-500/20">{loading ? "Enregistrement..." : "Créer l&apos;article"}</button>
                 </div>
              </form>
           </div>
@@ -649,7 +649,7 @@ const RemindersTab = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">Candidats avec Impayés</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-500">Liste des apprenants dont le compte affiche "Non Payé" ou "Partiel".</p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">Liste des apprenants dont le compte affiche &quot;Non Payé&quot; ou &quot;Partiel&quot;.</p>
         </div>
         <button className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20 text-sm font-bold">
           <Bell size={18} /> Relance Collective Email

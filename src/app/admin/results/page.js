@@ -52,98 +52,99 @@ export default function ResultsGridPage() {
   const fileInputRef = useRef(null);
 
   // 1. Charger les sessions au montage
-  useEffect(() => {
-    async function loadSessions() {
-      try {
-        const res = await fetch("/api/admin/sessions");
-        if (res.ok) {
-          const data = await res.json();
-          setSessions(data);
-          if (data.length > 0) {
-            setSelectedSessionId(data[0].id);
-          }
+  const loadSessions = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/sessions");
+      if (res.ok) {
+        const data = await res.json();
+        setSessions(data);
+        if (data.length > 0) {
+          setSelectedSessionId(data[0].id);
         }
-      } catch (error) {
-        toast.error("Erreur de chargement des sessions");
-      } finally {
-        setLoading(false);
       }
+    } catch (error) {
+      toast.error("Erreur de chargement des sessions");
+    } finally {
+      setLoading(false);
     }
-    loadSessions();
   }, []);
 
-  // 2. Charger les candidats et résultats quand la session change
   useEffect(() => {
+    loadSessions();
+  }, [loadSessions]);
+
+  // 2. Charger les candidats et résultats quand la session change
+  const loadResults = React.useCallback(async () => {
     if (!selectedSessionId) return;
-
-    async function loadResults() {
-      setLoadingResults(true);
-      try {
-        const res = await fetch(`/api/admin/results?sessionId=${selectedSessionId}`);
-        if (res.ok) {
-          const data = await res.json();
-          // Définir les noms de modules selon le niveau de la session
-          let standardNames = [];
-          if (data.session.level === "A1" || data.session.level === "A2") {
+    setLoadingResults(true);
+    try {
+      const res = await fetch(`/api/admin/results?sessionId=${selectedSessionId}`);
+      if (res.ok) {
+        const data = await res.json();
+        // Définir les noms de modules selon le niveau de la session
+        let standardNames = [];
+        if (data.session.level === "A1" || data.session.level === "A2") {
              standardNames = ["Lesen", "Hören", "Schreiben 1", "Schreiben 2", "Sprechen"];
-          } else if (data.session.level === "B1" || data.session.level === "B2") {
+        } else if (data.session.level === "B1" || data.session.level === "B2") {
              standardNames = ["Lesen", "Hören", "Schreiben", "Sprechen"];
-          } else {
+        } else {
              standardNames = ["Lesen", "Hören", "Schreiben", "Schreiben 1", "Schreiben 2", "Sprechen"];
-          }
-          setModules(standardNames.map(name => ({ id: name, name })));
-          
-          // Transformer les données de la BD pour le state local
-          const formattedCandidates = data.candidates.map(c => {
-            const result = c.results[0] || {};
-            const scores = {};
-            const registeredModuleConfigs = {}; // Pour stocker les maxScore et IDs réels
-
-            // Chercher pour chaque module standard s'il existe une config pour ce candidat
-            standardNames.forEach(name => {
-                // Trouver le module correspondant au niveau du candidat
-                const moduleDef = data.modules.find(m => m.name === name && m.level === c.level);
-                
-                if (moduleDef) {
-                    // Vérifier si le candidat est inscrit à ce module
-                    const moduleScore = result.moduleScores?.find(ms => ms.moduleId === moduleDef.id);
-                    
-                    const ruleMax = OSD_RULES[c.level]?.[name]?.max || moduleDef.maxScore;
-                    const ruleMin = OSD_RULES[c.level]?.[name]?.min || 0;
-                    
-                    registeredModuleConfigs[name] = {
-                        id: moduleDef.id,
-                        max: ruleMax,
-                        min: ruleMin,
-                        isRegistered: !!moduleScore // On ne permet la saisie que si inscrit
-                    };
-                    scores[moduleDef.id] = moduleScore ? String(moduleScore.score) : "";
-                }
-            });
-
-            return {
-              id: c.id,
-              name: `${c.firstName} ${c.lastName}`,
-              number: c.candidateNumber,
-              level: c.level,
-              scores,
-              moduleConfigs: registeredModuleConfigs,
-              total: result.total || 0,
-              status: result.decision || "EN_ATTENTE",
-              resultId: result.id
-            };
-          });
-          
-          setCandidates(formattedCandidates);
         }
-      } catch (error) {
-        toast.error("Erreur de chargement des résultats");
-      } finally {
-        setLoadingResults(false);
+        setModules(standardNames.map(name => ({ id: name, name })));
+        
+        // Transformer les données de la BD pour le state local
+        const formattedCandidates = data.candidates.map(c => {
+          const result = c.results[0] || {};
+          const scores = {};
+          const registeredModuleConfigs = {}; // Pour stocker les maxScore et IDs réels
+
+          // Chercher pour chaque module standard s'il existe une config pour ce candidat
+          standardNames.forEach(name => {
+              // Trouver le module correspondant au niveau du candidat
+              const moduleDef = data.modules.find(m => m.name === name && m.level === c.level);
+              
+              if (moduleDef) {
+                  // Vérifier si le candidat est inscrit à ce module
+                  const moduleScore = result.moduleScores?.find(ms => ms.moduleId === moduleDef.id);
+                  
+                  const ruleMax = OSD_RULES[c.level]?.[name]?.max || moduleDef.maxScore;
+                  const ruleMin = OSD_RULES[c.level]?.[name]?.min || 0;
+                  
+                  registeredModuleConfigs[name] = {
+                      id: moduleDef.id,
+                      max: ruleMax,
+                      min: ruleMin,
+                      isRegistered: !!moduleScore // On ne permet la saisie que si inscrit
+                  };
+                  scores[moduleDef.id] = moduleScore ? String(moduleScore.score) : "";
+              }
+          });
+
+          return {
+            id: c.id,
+            name: `${c.firstName} ${c.lastName}`,
+            number: c.candidateNumber,
+            level: c.level,
+            scores,
+            moduleConfigs: registeredModuleConfigs,
+            total: result.total || 0,
+            status: result.decision || "EN_ATTENTE",
+            resultId: result.id
+          };
+        });
+        
+        setCandidates(formattedCandidates);
       }
+    } catch (error) {
+      toast.error("Erreur de chargement des résultats");
+    } finally {
+      setLoadingResults(false);
     }
-    loadResults();
   }, [selectedSessionId]);
+
+  useEffect(() => {
+    loadResults();
+  }, [loadResults]);
 
   const calculateResultsForCandidate = (candidate, newScores) => {
     let total = 0;
@@ -358,7 +359,7 @@ export default function ResultsGridPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#003366] dark:text-gray-100 ">Saisie des Résultats</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-500">Mode grille haute-performance pour l'entrée rapide des notes.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-500">Mode grille haute-performance pour l&apos;entrée rapide des notes.</p>
         </div>
         <div className="flex flex-wrap gap-3 relative">
           <input 

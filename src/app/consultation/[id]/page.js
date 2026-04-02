@@ -174,7 +174,7 @@ export default function ResultDetailPage() {
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="text-xl font-bold text-[#003366] mb-1">Gesamtpunktezahl</h3>
-                    <p className="text-sm text-gray-400">Score total sur l'ensemble des épreuves (min. {candidate.totalMin})</p>
+                    <p className="text-sm text-gray-400">Score total sur l&apos;ensemble des épreuves (min. {candidate.totalMin})</p>
                   </div>
                   <div className="text-right">
                     <p className="text-4xl font-black text-[#003366]">{candidate.total}<span className="text-lg opacity-30"> / {candidate.totalMax}</span></p>

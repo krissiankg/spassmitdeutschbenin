@@ -88,7 +88,7 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = React.useCallback(async () => {
     try {
       const response = await fetch("/api/admin/dashboard");
       if (response.ok) {
@@ -100,11 +100,11 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [fetchDashboardData]);
 
   return (
     <div className="space-y-8 pb-12">
@@ -116,8 +116,8 @@ export default function DashboardPage() {
           </h1>
           <p className="text-gray-500 dark:text-gray-500 mt-1">
             {isSecretary 
-              ? "Prêt pour la saisie des notes d'aujourd'hui ?" 
-              : "Voici ce qui se passe dans votre centre aujourd'hui."}
+              ? "Prêt pour la saisie des notes d&apos;aujourd&apos;hui ?" 
+              : "Voici ce qui se passe dans votre centre aujourd&apos;hui."}
           </p>
         </div>
         <div className="flex gap-3">
@@ -209,7 +209,7 @@ export default function DashboardPage() {
             <HelpCircle size={24} className="text-[#D4AF37]" />
           </div>
           
-          <h3 className="text-xl font-bold mb-2 text-white">Besoin d'aide ?</h3>
+          <h3 className="text-xl font-bold mb-2 text-white">Besoin d&apos;aide ?</h3>
           <p className="text-sm text-blue-100/80 mb-8 leading-relaxed">
             Consultez nos guides interactifs pour apprendre à gérer les sessions, les inscriptions et les paiements en toute sérénité.
           </p>
@@ -231,7 +231,7 @@ export default function DashboardPage() {
         {/* Colonne 2 : Graphique Répartition des Niveaux */}
         <div className="card-premium p-8">
           <h3 className="text-xl font-bold text-[#003366] dark:text-gray-100 mb-2">Répartition par Niveau</h3>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mb-6">Volume total d'étudiants par parcours</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mb-6">Volume total d&apos;étudiants par parcours</p>
           {loading ? (
              <div className="h-48 flex justify-center items-center"><Loader2 className="animate-spin text-[#003366] dark:text-gray-100 " size={32} /></div>
           ) : data?.levelDistribution?.length > 0 ? (
@@ -279,7 +279,7 @@ export default function DashboardPage() {
              </div>
              <div>
                 <h3 className="text-lg font-bold text-[#003366] dark:text-gray-100 ">Ajout Rapide</h3>
-                <p className="text-[11px] text-gray-400 dark:text-gray-500">Créer un candidat "en attente"</p>
+                <p className="text-[11px] text-gray-400 dark:text-gray-500">Créer un candidat &quot;en attente&quot;</p>
              </div>
           </div>
           

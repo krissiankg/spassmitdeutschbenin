@@ -155,7 +155,7 @@ export default function ConsultationPage() {
               href="/"
               className="text-gray-500 hover:text-[#003366] flex items-center gap-2 text-sm transition-colors"
             >
-              <ArrowLeft size={16} /> Retour à l'accueil
+              <ArrowLeft size={16} /> Retour à l&apos;accueil
             </Link>
           </div>
         </div>
@@ -263,7 +263,7 @@ export default function ConsultationPage() {
                       • Le code de consultation vous a été envoyé par email lors de la publication.
                     </li>
                     <li className="flex items-start gap-2 italic">
-                      • En cas d'oubli, contactez le secrétariat du centre.
+                      • En cas d&apos;oubli, contactez le secrétariat du centre.
                     </li>
                   </ul>
                 </div>

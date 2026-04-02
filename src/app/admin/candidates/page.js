@@ -39,7 +39,7 @@ export default function CandidatesPage() {
   
   const fileInputRef = useRef(null);
 
-  const loadCandidates = async () => {
+  const loadCandidates = React.useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -62,12 +62,10 @@ export default function CandidatesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, searchTerm, filterLevel, filterSession, dbSessions]);
 
-  const loadSessions = async () => {
+  const loadSessions = React.useCallback(async () => {
     try {
-      const ObjectRes = Object.assign({}, await (await fetch("/api/admin/sessions")).json());
-      // we only care about the response ok
       const res = await fetch("/api/admin/sessions");
       if (res.ok) {
         const data = await res.json();
@@ -77,9 +75,9 @@ export default function CandidatesPage() {
     } catch (error) {
       console.error("Error loading sessions:", error);
     }
-  };
+  }, []);
 
-  const loadFormFields = async () => {
+  const loadFormFields = React.useCallback(async () => {
     try {
       const res = await fetch("/api/form-settings");
       if (res.ok) {
@@ -87,11 +85,11 @@ export default function CandidatesPage() {
         setCustomFields(data.fields);
       }
     } catch (e) {}
-  };
+  }, []);
 
   useEffect(() => {
     loadCandidates();
-  }, [page, limit, filterLevel, filterSession]);
+  }, [loadCandidates]);
 
   // Debouncing search
   useEffect(() => {
@@ -100,12 +98,12 @@ export default function CandidatesPage() {
       else loadCandidates();
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, page, loadCandidates]);
 
   useEffect(() => {
     loadSessions();
     loadFormFields();
-  }, []);
+  }, [loadSessions, loadFormFields]);
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -572,7 +570,7 @@ export default function CandidatesPage() {
           <div className="absolute inset-0 bg-[#003366]/20 backdrop-blur-sm" onClick={() => setIsImportModalOpen(false)}></div>
           <div className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-lg border border-gray-100 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-[#003366]">Confirmer l'importation</h2>
+              <h2 className="text-xl font-bold text-[#003366]">Confirmer l&apos;importation</h2>
               <button onClick={() => setIsImportModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400"><X size={20} /></button>
             </div>
 

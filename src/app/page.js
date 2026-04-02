@@ -70,7 +70,7 @@ export default function HomePage() {
                 <GraduationCap size={14} /> La référence Allemande
               </div>
               <h1 className="text-5xl md:text-6xl font-extrabold text-[#003366] dark:text-white tracking-tight mb-8 leading-[1.1]">
-                Consultez vos résultats d'examen en <span className="text-[#D4AF37]">toute simplicité</span>
+                Consultez vos résultats d&apos;examen en <span className="text-[#D4AF37]">toute simplicité</span>
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed">
                 Une plateforme moderne et sécurisée pour les candidats et les administrateurs du centre Spass mit Deutsch au Bénin.
@@ -203,9 +203,9 @@ export default function HomePage() {
           </div>
           <div className="space-y-6">
             {[
-              { q: "Comment obtenir mon code de consultation ?", a: "Votre code vous est transmis par mail ou SMS lors de votre inscription à la session d'examen." },
+              { q: "Comment obtenir mon code de consultation ?", a: "Votre code vous est transmis par mail ou SMS lors de votre inscription à la session d&apos;examen." },
               { q: "Les résultats sont-ils officiels ?", a: "Oui, les notes publiées ici correspondent aux délibérations officielles du centre." },
-              { q: "Puis-je imprimer mon relevé ?", a: "Absolument. Un bouton 'Télécharger PDF' vous permet d'obtenir une version imprimable." }
+              { q: "Puis-je imprimer mon relevé ?", a: "Absolument. Un bouton &apos;Télécharger PDF&apos; vous permet d&apos;obtenir une version imprimable." }
             ].map((faq, i) => (
               <div key={i} className="p-6 bg-gray-50 dark:bg-[#1A1A1A] rounded-2xl border border-gray-100 dark:border-gray-800">
                 <h4 className="font-bold text-[#003366] dark:text-[#D4AF37] mb-2">{faq.q}</h4>
@@ -227,7 +227,7 @@ export default function HomePage() {
                 <span className="font-bold text-2xl tracking-tight">Spass mit Deutsch Benin</span>
               </div>
               <p className="text-white/60 max-w-sm mb-6">
-                Le centre de référence pour l'apprentissage de la langue allemande au Bénin. Excellence, rigueur et réussite.
+                Le centre de référence pour l&apos;apprentissage de la langue allemande au Bénin. Excellence, rigueur et réussite.
               </p>
             </div>
             <div>

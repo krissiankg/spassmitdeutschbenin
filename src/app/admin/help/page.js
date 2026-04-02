@@ -59,10 +59,10 @@ export default function HelpPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-gray-100 dark:border-gray-800 pb-10">
         <div>
           <h1 className="text-5xl font-black text-[#003366] dark:text-white tracking-tighter mb-4">
-            Centre d'Aide
+            Centre d&apos;Aide
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl font-medium">
-            Guides complets et tutoriels pour maîtriser votre plateforme de gestion d'examens.
+            Guides complets et tutoriels pour maîtriser votre plateforme de gestion d&apos;examens.
           </p>
         </div>
       </div>
@@ -90,7 +90,7 @@ export default function HelpPage() {
           <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
             <HelpSection title="Présentation de la Plateforme" icon={BookOpen}>
               <p className="text-xl">
-                L'interface d'administration de **Spass mit Deutsch Benin** a été conçue pour offrir une expérience fluide, sécurisée et performante. Elle automatise les processus critiques tout en garantissant une traçabilité totale.
+                L&apos;interface d&apos;administration de **Spass mit Deutsch Benin** a été conçue pour offrir une expérience fluide, sécurisée et performante. Elle automatise les processus critiques tout en garantissant une traçabilité totale.
               </p>
               <div className="grid md:grid-cols-2 gap-8 mt-10">
                 <div className="p-8 bg-blue-50 dark:bg-blue-900/10 rounded-[2.5rem] border border-blue-100 dark:border-blue-800 relative overflow-hidden group">
@@ -98,14 +98,14 @@ export default function HelpPage() {
                   <h3 className="font-black text-2xl text-[#003366] dark:text-blue-300 mb-3 flex items-center gap-3">
                     Objectif principal
                   </h3>
-                  <p className="text-gray-700 dark:text-gray-300 font-medium">Simplifier le cycle de vie d'une session, de l'inscription à la distribution numérique des résultats.</p>
+                  <p className="text-gray-700 dark:text-gray-300 font-medium">Simplifier le cycle de vie d&apos;une session, de l&apos;inscription à la distribution numérique des résultats.</p>
                 </div>
                 <div className="p-8 bg-amber-50 dark:bg-amber-900/10 rounded-[2.5rem] border border-amber-100 dark:border-amber-800 relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-125 transition-transform"><Shield size={80}/></div>
                   <h3 className="font-black text-2xl text-amber-800 dark:text-amber-400 mb-3 flex items-center gap-3">
                     Sécurité renforcée
                   </h3>
-                  <p className="text-gray-700 dark:text-gray-300 font-medium">Un journal d'audit permanent enregistre chaque modification sensible pour prévenir toute erreur humaine.</p>
+                  <p className="text-gray-700 dark:text-gray-300 font-medium">Un journal d&apos;audit permanent enregistre chaque modification sensible pour prévenir toute erreur humaine.</p>
                 </div>
               </div>
             </HelpSection>
@@ -120,7 +120,7 @@ export default function HelpPage() {
                   <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-4 flex items-center gap-3">
                     <Calendar size={24} /> 1. Gestion des Sessions
                   </h3>
-                  <p className="text-gray-700 dark:text-gray-300 italic mb-6">La session est le coeur de l'organisation.</p>
+                  <p className="text-gray-700 dark:text-gray-300 italic mb-6">La session est le coeur de l&apos;organisation.</p>
                   <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
                     <p>Définissez clairement le **Niveau visé** car il détermine les modules de notes qui seront affichés plus tard.</p>
                   </div>
@@ -136,7 +136,7 @@ export default function HelpPage() {
                   </div>
                   <div className="mt-8 p-6 bg-[#003366]/5 dark:bg-blue-400/5 rounded-3xl border-2 border-dashed border-[#003366]/20 dark:border-blue-400/20">
                     <p className="text-sm font-bold text-[#003366] dark:text-blue-300 flex items-center gap-2">
-                       <HelpCircle size={16}/> À SAVOIR : Le système attribue automatiquement un Matricule et un Code Secret dès l'inscription.
+                       <HelpCircle size={16}/> À SAVOIR : Le système attribue automatiquement un Matricule et un Code Secret dès l&apos;inscription.
                     </p>
                   </div>
                 </section>
@@ -147,7 +147,7 @@ export default function HelpPage() {
                     <Shield size={32} className="text-[#D4AF37]" /> Publication Officielle
                   </h3>
                   <p className="text-lg text-blue-100/90 mb-8 max-w-2xl">
-                    Le bouton **Publier** ne doit être cliqué qu'une fois la saisie vérifiée.
+                    Le bouton **Publier** ne doit être cliqué qu&apos;une fois la saisie vérifiée.
                   </p>
                   <div className="flex flex-wrap gap-4">
                     <span className="px-5 py-3 bg-white/10 rounded-2xl border border-white/20 text-sm font-bold uppercase tracking-widest">Email auto aux candidats</span>
@@ -170,7 +170,7 @@ export default function HelpPage() {
                   <div className="grid gap-6">
                     <div className="p-8 bg-emerald-50 dark:bg-emerald-900/10 rounded-3xl border border-emerald-100 dark:border-emerald-800">
                       <h4 className="font-black text-xl text-emerald-800 dark:text-emerald-400 mb-2">Paiements & Statuts</h4>
-                      <p className="text-emerald-700/80 dark:text-emerald-300/80">Le système calcule automatiquement le reste-à-payer pour chaque élève. Un paiement partiel mettra le dossier en "Orange" (Partiel).</p>
+                      <p className="text-emerald-700/80 dark:text-emerald-300/80">Le système calcule automatiquement le reste-à-payer pour chaque élève. Un paiement partiel mettra le dossier en &quot;Orange&quot; (Partiel).</p>
                     </div>
                     <div className="p-8 bg-blue-50 dark:bg-blue-900/10 rounded-3xl border border-blue-100 dark:border-blue-800">
                       <h4 className="font-black text-xl text-[#003366] dark:text-blue-300 mb-2">Génération de Reçus</h4>
@@ -181,7 +181,7 @@ export default function HelpPage() {
 
                 <section className="bg-gray-50 dark:bg-gray-800/50 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700">
                   <h4 className="font-black text-xl mb-4">Configuration des Tarifs</h4>
-                  <p className="mb-6">C'est ici que vous définissez si un niveau B2 coûte plus cher qu'un niveau A1, ou si l'examen de préparation est inclus ou non.</p>
+                  <p className="mb-6">C&apos;est ici que vous définissez si un niveau B2 coûte plus cher qu&apos;un niveau A1, ou si l&apos;examen de préparation est inclus ou non.</p>
                   <div className="flex items-center gap-4 text-sm font-bold text-gray-500">
                     <ArrowRight size={16} /> Les tarifs modifiés ne sont pas rétroactifs.
                   </div>
@@ -196,16 +196,16 @@ export default function HelpPage() {
             <HelpSection title="Audit & Sécurité" icon={Shield}>
               <div className="space-y-12">
                 <section>
-                   <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-4">Journal d'Audit Intégral</h3>
-                   <p className="text-lg italic text-gray-600 dark:text-gray-400 mb-8">"Rien n'est jamais vraiment supprimé sans trace."</p>
+                   <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-4">Journal d&apos;Audit Intégral</h3>
+                   <p className="text-lg italic text-gray-600 dark:text-gray-400 mb-8">&quot;Rien n&apos;est jamais vraiment supprimé sans trace.&quot;</p>
                    <div className="grid md:grid-cols-2 gap-8">
                      <div className="flex gap-4 items-start">
                        <CheckCircle className="text-emerald-500 shrink-0" size={24} />
-                       <p className="text-sm">Modification de note : Enregistrée avec l'ancienne et la nouvelle valeur.</p>
+                       <p className="text-sm">Modification de note : Enregistrée avec l&apos;ancienne et la nouvelle valeur.</p>
                      </div>
                      <div className="flex gap-4 items-start">
                        <CheckCircle className="text-emerald-500 shrink-0" size={24} />
-                       <p className="text-sm">Suppression de candidat : Trace qui a effectué l'action et quand.</p>
+                       <p className="text-sm">Suppression de candidat : Trace qui a effectué l&apos;action et quand.</p>
                      </div>
                    </div>
                 </section>
