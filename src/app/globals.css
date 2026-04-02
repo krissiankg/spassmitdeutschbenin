@@ -2,32 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --primary: #003366; /* Deep Blue */
+    --primary-hover: #002244;
+    --secondary: #D4AF37; /* Metallic Gold */
+    --accent: #FF8A00; /* Soft Orange / Gold-ish */
+    --background: #FFFFFF;
+    --foreground: #111827;
+    --muted: #F3F4F6;
+    --muted-foreground: #6B7280;
+    --border: #E5E7EB;
+    --radius: 0.75rem;
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --card-bg: #FFFFFF;
+  }
+
+  .dark {
+    --primary: #8AB4F8; /* Lighter blue for dark mode */
+    --primary-hover: #AECBFA;
+    --secondary: #D4AF37; /* Metallic Gold */
+    --accent: #FF8A00; 
+    --background: #121212;
+    --foreground: #F3F4F6;
+    --muted: #1F2937;
+    --muted-foreground: #9CA3AF;
+    --border: #374151;
+    --glass-bg: rgba(30, 30, 30, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --card-bg: #1E1E1E;
+  }
+
+  body {
+    @apply bg-white dark:bg-[#121212] antialiased text-gray-900 dark:text-gray-100 transition-colors duration-300;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.glass {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.card-premium {
+  background-color: var(--card-bg);
+  @apply rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300 text-gray-900 dark:text-gray-100;
 }
+
+.btn-primary {
+  @apply px-6 py-2.5 bg-[#003366] dark:bg-white dark:text-[#003366] text-white rounded-lg font-bold hover:bg-[#002244] dark:hover:bg-gray-200 transition-all transform hover:-translate-y-0.5 active:translate-y-0;
+}
+
+.btn-secondary {
+  @apply px-6 py-2.5 bg-white dark:bg-[#1E1E1E] text-[#003366] dark:text-white border border-[#003366] dark:border-gray-700 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all;
+}
+
+/* Identité visuelle d'accent (Drapeau Allemand) */
+.german-accent-bar {
+  background: linear-gradient(to right, #000000 33%, #DD0000 33%, #DD0000 66%, #FFCC00 66%);
+}
+

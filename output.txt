@@ -1,0 +1,26 @@
+Chargé 105 contacts du CSV.
+Trouvé 98 candidats en base de données.
+
+--- Détails des matches ---
+Christiano ADANDE -> adandechristiano@gmail.com
+Bérénice ADJAVOUNVOUN -> adjadjavounvounberenice@gmail.com
+Estelle AGBESSI -> estelleagbessi189@gmail.com
+Carmel AHIKPON -> carmelahikpon2@gmail.com
+Wifak AKADIRI -> wifakadjao2008@gmail.com
+Félicien AMOUSSOU -> amoussoufelicien5@gmail.com
+Jean-Pierre ANAGONOU -> jeanpierreanagonou70@gmail.com
+Michkath INOUSSA -> mazourathalaoussa@gmail.com
+Richard JAKOU -> richardjakou@gmail.com
+Isabelle LEJIOGUIA -> lejioguiaisabelle@yahoo.fr
+Marvelous MOZIMO -> mhizmmozimo@gmail.com
+Nadjahatou OUSMANE -> ousmanenadja945@gmail.com
+Gabin QUENUM -> gabinquenum61@gmail.com
+Stella Yolande SOSSOUKPE -> stellayolande@gmail.com
+Herbert VLAVONOU -> herbertvlavonou39@gmail.com
+
+--- Résumé ---
+Candidats sans email : 98
+Matches trouvés dans le CSV : 15
+
+[MODE SIMULATION]
+Relancez le script avec l'argument --apply pour enregistrer les changements.

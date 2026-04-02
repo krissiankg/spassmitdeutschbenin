@@ -1,0 +1,65 @@
+Chargé 105 contacts du CSV.
+Trouvé 98 candidats en base de données.
+
+--- Détails des matches ---
+Thierry ABAHOU -> thierry93edgard@gmail.com
+Thalès ACOGO -> thalesacogo36@gmail.com
+Luc Davy ADJIKOUIN -> lucdavyadjikouin01@gmail.com
+Abed AGBOHOUTO -> abedagbohouto@gmail.com
+Monel AGOSSOU -> agossoumonel6@gmail.com
+Géraud AHIKPON -> ahikpongeraud@gmail.com
+Solange AKOAKOU -> fifamesolangeakoakou@gmail.com
+Christine AKOTONOU -> meisterbring@gmail.com
+Achabi ALAO -> moustahinathachabi@gmail.com
+Marie-Rose AMOUSSOU -> marieroseamoussou297@gmail.com
+Daniel ANIFA -> danielakuete.23@gmail.com
+Brunel ATCHIDI -> brunelatchidi@gmail.com
+Jean ATCHRIMI -> komlanjeanatchrimi347@gmail.com
+Olivier AWANOU -> oawanou@gmail.com
+Marwiyath BA-AGBA -> marwibbg@gmail.com
+Sergio DAANON -> sergioaxeldaanon@gmail.com
+Ibrahim DANTE -> ibrahimdante4@gmail.com
+Hamdiya DJATCHI -> djatchihamdiya@gmail.com
+Jespéro DOSSOU -> jesperodossou770@gmail.com
+Brigitte DOVONOU -> brigittemahugnon2000@gmail.com
+Elodie ESSE -> hounglatohortense@gmail.com
+Déo-Gratias FAGLA -> fagladeogracia@gmail.com
+Natacha FAGNON -> fagnonnatacha918@gmail.com
+Emma FONTON -> emmadobre205@gmail.com
+Expédit FONTON -> expeditfonton2@gmail.com
+Dickens HOUNDETE -> houndetedickens872@gmail.com
+Laura HOUNGA -> houngalaura4@gmail.com
+Arafat HOUNGBEDJI -> arafat.adouni33@gmail.com
+Eunicia HOUNGUEVOU -> euniciahounguevou@gmail.com
+Kamal HOUNKPEVI -> hounkpevikamal@gmail.com
+Mechack KANLINSOU -> mechacksama24@gmail.com
+Christian KOUSSOUGBO -> christiankoussougbo3@gmail.com
+Hubert KOUTON -> correctzen@gmail.com
+Lisette MALATE -> lisettearlette4@gmail.com
+Michel MONTCHO -> jacquesmontcho202@gmail.com
+Faïkoth MOUSTAPHA -> faicothmoustapha98@gmail.com
+Samuel PAKAPOH -> sasamuelsagui@gmail.com
+Esther POUSSEU -> ejpousseu@gmail.com
+Borgia QUENUM -> quenumborgia@gmail.com
+Olafoumi SABO -> saboolafoumi@gmail.com
+Olafoumi SABO -> saboolafoumi@gmail.com
+Guillaume SAH -> maelsah09@gmail.com
+Youssira SANNI -> sanniyouzirath@gmail.com
+Yolande SOSSOUKPE -> stellayolande@gmail.com
+Houriyath TAÏROU -> houriyathtairou@gmail.com
+Antoine TCHANO -> antoinetchano@gmail.com
+Marlène TCHANOU -> lauretchanou58@gmail.com
+Same TOMTOKOM -> tomtokoms@gmail.com
+Jean-Bienvenu VISSOH -> vissohbidossessi@gmail.com
+Rafiatou YABI -> rafiath424@gmail.com
+Claudia Melissa YANKEP -> claudiafanyep21@gmail.com
+Whalis YEDJANLOGNON -> whalisyedjanlognon@gmail.com
+Mariama ZINSOU -> mariamazinsou21@gmail.com
+Roxane ZINSOU -> immazinsou08@gmail.com
+
+--- Résumé ---
+Candidats sans email : 83
+Matches trouvés dans le CSV : 54
+
+[MODE SIMULATION]
+Relancez le script avec l'argument --apply pour enregistrer les changements.

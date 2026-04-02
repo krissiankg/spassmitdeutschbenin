@@ -1,0 +1,26 @@
+Candidats restants sans email en BD: 83
+Contacts restants avec email dans le CSV: 105
+
+--- 10 premiers candidats restants sans email ---
+Thierry ABAHOU
+Thalès ACOGO
+Mechack ADJEDJEGO
+Luc Davy ADJIKOUIN
+Abed AGBOHOUTO
+Monel AGOSSOU
+Donald AGOSSOUVO
+Déo-Gratias AHEGNI
+Géraud AHIKPON
+Tania AÏGBAN
+
+--- 10 premiers contacts CSV non matchés ---
+Clarence Privilege Zobikila -> zozoww97@gmail.com
+Wifak Akadiri -> wifakadjao2008@gmail.com
+Whalis Dino YEDJANLOGNON -> whalisyedjanlognon@gmail.com
+Bidossessi Jean Bienvenu Vissoh -> vissohbidossessi@gmail.com
+Roger Babatu -> thuh@kugtt.com
+Thierry Edgard ABAHOU -> thierry93edgard@gmail.com
+Kouassi thalès ACOGO -> thalesacogo36@gmail.com
+Stella Yolande SOSSOUKPE -> stellayolande@gmail.com
+Sinatou Abeni SANNI -> sinantousanni@gmail.com
+Viwanou Odjougbélè Bonaventure Sergio SINGBO -> sergiosingbo25@gmail.com

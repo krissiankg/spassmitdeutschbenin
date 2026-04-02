@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Candidate {
+  id               String   @id @default(cuid())
+  candidateNumber  String   @unique
+  firstName        String
+  lastName         String
+  gender           String?  // 'M' ou 'F'
+  dateOfBirth      DateTime?
+  birthPlace       String?
+  country          String?
+  idType           String?  // CIP, CNI, Passport
+  idNumber         String?
+  idIssueDate      DateTime?
+  idExpiryDate     DateTime?
+  phone            String?
+  email            String?
+  documentUrl      String?  // Fichier uplaodé (CNI, Passeport...)
+  level            String   // A1, A2, B1, B2 (Scindé par le serveur si multiple)
+  sessionId        String?
+  session          Session? @relation(fields: [sessionId], references: [id])
+  center           String?
+  searchKeyword    String?
+  consultationCode String   @unique
+  status           String   @default("APPROVED") // PENDING (Non vérifié) ou APPROVED (Inscrit actif)
+  chosenModules    String[] // Ex: ["ZA1_ORAL", "ZA1_ECRIT"]
+  prepCourses      String[] // Ex: ["PREP_B1_INTERNE"]
+  totalAmount      Int?     // Prix total attribué à ce dossier (modifiable pour ajouter des pénalités)
+  amountPaid       Int      @default(0) // Montant déjà payé
+  paymentStatus    String   @default("UNPAID") // UNPAID, PARTIAL, PAID
+  payments         Payment[]
+
+  customData       Json?    // Réponses dynamiques issues du Form Builder
+
+  results          Result[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Pricing {
+  id          String   @id @default(cuid())
+  category    String   // MODULE, PREP_COURSE, LEVEL, ou dynamique via PricingCategory
+  code        String   @unique // Identifiant technique (ex: ZA1_ORAL, PREP_B1_EXT)
+  label       String   // Nom affiché (ex: "Oral", "B1 (Apprenants Externes)")
+  price       Int      @default(0) // Prix en FCFA
+  level       String?  // Niveau de rattachement (ZA1, B1...)
+  description String?
+  isActive    Boolean  @default(true) // Contrôle d'affichage dans le formulaire
+}
+
+model PricingCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique // ex: "Frais de retards", "Frais de dossier"
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Payment {
+  id          String    @id @default(cuid())
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  amount      Int       // Montant payé
+  method      String    @default("CASH") // CASH, BANK_TRANSFER, MOBILE_MONEY
+  reference   String?   // N° de transaction si via banque/mobile money
+  recordedBy  String?   // Email ou Nom de l'admin ayant enregistré
+  createdAt   DateTime  @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, SUCCESS, WARNING
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Session {
+  id         String      @id @default(cuid())
+  title      String
+  date       DateTime
+  level      String
+  status     String      @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  candidates Candidate[]
+  results    Result[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Module {
+  id        String        @id @default(cuid())
+  name      String
+  code      String
+  coeff     Float         @default(1.0)
+  maxScore  Float         @default(20.0)
+  level     String
+  scores    ModuleScore[]
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  name     String
+  email    String @unique
+  password String
+  role     String @default("SECRETARY") // SUPER_ADMIN, SECRETARY, ACCOUNTANT
+}
+
+model Result {
+  id            String        @id @default(cuid())
+  candidateId   String
+  candidate     Candidate     @relation(fields: [candidateId], references: [id])
+  sessionId     String
+  session       Session       @relation(fields: [sessionId], references: [id])
+  moduleScores  ModuleScore[]
+  average       Float?
+  total         Float?
+  mention       String?
+  decision      String?       // ADMIS, AJOURNE, PARTIEL, ABSENT
+  adminComments String?
+  status        String        @default("DRAFT") // DRAFT, PUBLISHED
+  publishedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model ModuleScore {
+  id       String @id @default(cuid())
+  resultId String
+  result   Result @relation(fields: [resultId], references: [id])
+  moduleId String
+  module   Module @relation(fields: [moduleId], references: [id])
+  score    Float
+}
+
+// ----------------------------------------------------
+// FORM BUILDER DYNAMIQUE (Option A)
+// ----------------------------------------------------
+model FormSettings {
+  id             String   @id @default("global") // Un seul enregistrement global
+  isOpen         Boolean  @default(true)
+  closingMessage String   @default("Les inscriptions sont actuellement fermées.")
+  activeSessions String[] @default([]) // Nouveauté : contrôle des sessions actives
+}
+
+model FormField {
+  id          String   @id @default(cuid())
+  label       String
+  type        String   @default("TEXT") // TEXT, NUMBER, DATE, SELECT, FILE
+  required    Boolean  @default(false)
+  options     String[] // Utilisé si type = SELECT
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  adminEmail  String
+  adminName   String?
+  action      String   // e.g., "DELETE_CANDIDATE", "PUBLISH_RESULTS", "UPDATE_PAYMENT"
+  targetType  String   // e.g., "CANDIDATE", "SESSION", "PAYMENT", "ADMIN"
+  targetId    String?
+  targetName  String?  // e.g., "Jean Dupont" (to keep track even if deleted)
+  details     Json?    // Optional JSON for what changed
+  createdAt   DateTime @default(now())
+}
+
