@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+
+export const dynamic = 'force-dynamic';
 import { generateCode } from "@/lib/utils";
 
 export async function GET(request) {

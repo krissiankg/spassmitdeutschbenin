@@ -1,0 +1,100 @@
+  Γû▓ Next.js 14.2.35
+  - Environments: .env
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+
+./src/app/admin/layout.js
+117:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/consultation/page.js
+142:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/consultation/[id]/page.js
+97:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/login/page.js
+52:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/page.js
+14:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+226:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/register/page.js
+204:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/31) ...
+Dashboard API Error: n [Error]: Dynamic server usage: Route /api/admin/dashboard couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at l (C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\.next\server\chunks\8948.js:1:37220)
+    at d (C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\.next\server\chunks\9656.js:25:27870)
+    at s (C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\.next\server\chunks\9656.js:25:20859)
+    at u (C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\.next\server\app\api\admin\accounting\categories\route.js:1:4678)
+    at d (C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\.next\server\app\api\admin\dashboard\route.js:1:1277)
+    at C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\krissiank\Documents\GitHub\spassmitdeutschbenin\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093) {
+  description: "Route /api/admin/dashboard couldn't be rendered statically because it used `headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (7/31) 
+   Generating static pages (15/31) 
+   Generating static pages (23/31) 
+ Γ£ô Generating static pages (31/31)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                               Size     First Load JS
+Γöî Γùï /                                     6.48 kB         144 kB
+Γö£ Γùï /_not-found                           876 B          88.7 kB
+Γö£ Γùï /admin/accounting                     10.6 kB         282 kB
+Γö£ Γùï /admin/candidates                     8.76 kB         102 kB
+Γö£ Γùï /admin/dashboard                      121 kB          232 kB
+Γö£ Γùï /admin/form-builder                   6.19 kB          99 kB
+Γö£ Γùï /admin/help                           4.27 kB         133 kB
+Γö£ Γùï /admin/results                        145 kB          246 kB
+Γö£ Γùï /admin/sessions                       5.16 kB         106 kB
+Γö£ Γùï /admin/settings                       8.72 kB         111 kB
+Γö£ ╞Æ /api/admin/accounting/cashier         0 B                0 B
+Γö£ ╞Æ /api/admin/accounting/categories      0 B                0 B
+Γö£ ╞Æ /api/admin/accounting/payments        0 B                0 B
+Γö£ ╞Æ /api/admin/accounting/update-total    0 B                0 B
+Γö£ ╞Æ /api/admin/audit-logs                 0 B                0 B
+Γö£ ╞Æ /api/admin/candidates                 0 B                0 B
+Γö£ ╞Æ /api/admin/candidates/[id]            0 B                0 B
+Γö£ ╞Æ /api/admin/candidates/import          0 B                0 B
+Γö£ ╞Æ /api/admin/communications/send-codes  0 B                0 B
+Γö£ ╞Æ /api/admin/dashboard                  0 B                0 B
+Γö£ ╞Æ /api/admin/form-builder               0 B                0 B
+Γö£ ╞Æ /api/admin/notifications              0 B                0 B
+Γö£ ╞Æ /api/admin/pricing                    0 B                0 B
+Γö£ ╞Æ /api/admin/profile                    0 B                0 B
+Γö£ ╞Æ /api/admin/results                    0 B                0 B
+Γö£ ╞Æ /api/admin/sessions                   0 B                0 B
+Γö£ ╞Æ /api/admin/sessions/[id]              0 B                0 B
+Γö£ ╞Æ /api/admin/sessions/[id]/publish      0 B                0 B
+Γö£ ╞Æ /api/admin/test-email                 0 B                0 B
+Γö£ ╞Æ /api/admin/users                      0 B                0 B
+Γö£ ╞Æ /api/admin/users/[id]                 0 B                0 B
+Γö£ ╞Æ /api/auth/[...nextauth]               0 B                0 B
+Γö£ ╞Æ /api/consultation                     0 B                0 B
+Γö£ ╞Æ /api/form-settings                    0 B                0 B
+Γö£ ╞Æ /api/pricing                          0 B                0 B
+Γö£ ╞Æ /api/register                         0 B                0 B
+Γö£ Γùï /consultation                         7.76 kB         150 kB
+Γö£ ╞Æ /consultation/[id]                    4.92 kB         276 kB
+Γö£ Γùï /login                                3.95 kB         115 kB
+Γöö Γùï /register                             7.45 kB         150 kB
++ First Load JS shared by all             87.8 kB
+  Γö£ chunks/117-e8b5821ac153ec0e.js        31.9 kB
+  Γö£ chunks/fd9d1056-17ce1eb79d6b0ab3.js   53.6 kB
+  Γöö other shared chunks (total)           2.23 kB
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+
