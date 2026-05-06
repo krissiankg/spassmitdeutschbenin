@@ -408,7 +408,7 @@ export default function FormBuilderPage() {
                 {configType === 'SESSIONS' ? "Sessions d'Examens Proposées" : "Modules & Tarifs Proposés"}
 
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">Sélectionnez ce qui doit être disponible sur le formulaire d'inscription public actuellement.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">Sélectionnez ce qui doit être disponible sur le formulaire d&apos;inscription public actuellement.</p>
             
             <div className="overflow-y-auto pr-2 space-y-3 flex-1 mb-6">
                 {configType === 'SESSIONS' && dbSessions.length === 0 && <p className="text-center text-gray-400 dark:text-gray-500 py-10">Aucune session créée dans le système.</p>}

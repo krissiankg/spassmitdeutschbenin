@@ -16,7 +16,7 @@ export default function PrivacyPolicy() {
         <div className="relative max-w-4xl mx-auto text-center">
           <Link href="/" className="inline-flex items-center gap-2 text-blue-200 hover:text-white transition-colors mb-8 group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
           <h1 className="text-4xl md:text-5xl font-black text-white mb-6">Politique de Confidentialité</h1>
           <p className="text-blue-100/80 max-w-2xl mx-auto leading-relaxed">
@@ -36,7 +36,7 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold">Engagement de Protection</h2>
             </div>
             <p className="leading-relaxed">
-              Le centre <strong>Spass mit Deutsch Benin</strong> accorde une importance capitale à la sécurité de vos informations. Cette politique détaille la manière dont nous collectons, utilisons et protégeons vos données personnelles dans le cadre de nos services de formation et d'examens.
+              Le centre <strong>Spass mit Deutsch Benin</strong> accorde une importance capitale à la sécurité de vos informations. Cette politique détaille la manière dont nous collectons, utilisons et protégeons vos données personnelles dans le cadre de nos services de formation et d&apos;examens.
             </p>
           </section>
 
@@ -85,11 +85,11 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold">Sécurité des Données</h2>
             </div>
             <p className="leading-relaxed">
-              Conformément à l'article 415 du Code du Numérique, nous mettons en œuvre des mesures techniques rigoureuses :
+              Conformément à l&apos;article 415 du Code du Numérique, nous mettons en œuvre des mesures techniques rigoureuses :
             </p>
             <div className="bg-blue-50/50 dark:bg-blue-900/10 rounded-2xl p-6 border border-blue-100 dark:border-blue-800/50">
               <p className="text-sm italic text-[#003366] dark:text-blue-300 leading-relaxed">
-                "Toutes les communications sont protégées par le protocole HTTPS. Les mots de passe sont hashés via l'algorithme bcrypt et les accès administratifs sont tracés via un journal d'audit permanent."
+                &quot;Toutes les communications sont protégées par le protocole HTTPS. Les mots de passe sont hashés via l&apos;algorithme bcrypt et les accès administratifs sont tracés via un journal d&apos;audit permanent.&quot;
               </p>
             </div>
           </section>
@@ -101,7 +101,7 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold">Vos Droits</h2>
             </div>
             <p className="leading-relaxed">
-              Vous disposez d'un droit d'accès, de rectification et d'opposition sur vos données. Pour exercer ces droits, vous pouvez :
+              Vous disposez d&apos;un droit d&apos;accès, de rectification et d&apos;opposition sur vos données. Pour exercer ces droits, vous pouvez :
             </p>
             <div className="p-6 bg-emerald-50/30 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/50 rounded-2xl">
               <p className="text-sm font-bold text-emerald-800 dark:text-emerald-400 mb-2">Contactez notre délégué à la protection des données :</p>
@@ -119,7 +119,7 @@ export default function PrivacyPolicy() {
               <div>
                 <h3 className="font-bold text-gray-800 dark:text-gray-200">Autorité de Protection (APDP)</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                  Ce traitement de données est en cours de déclaration auprès de l'Autorité de Protection des Données Personnelles du Bénin. Pour toute plainte non résolue par nos soins, vous pouvez saisir l'APDP sur www.apdp.bj.
+                  Ce traitement de données est en cours de déclaration auprès de l&apos;Autorité de Protection des Données Personnelles du Bénin. Pour toute plainte non résolue par nos soins, vous pouvez saisir l&apos;APDP sur www.apdp.bj.
                 </p>
               </div>
             </div>

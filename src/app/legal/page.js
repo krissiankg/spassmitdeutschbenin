@@ -16,11 +16,11 @@ export default function LegalMentions() {
         <div className="relative max-w-4xl mx-auto text-center">
           <Link href="/" className="inline-flex items-center gap-2 text-blue-200 hover:text-white transition-colors mb-8 group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
           <h1 className="text-4xl md:text-5xl font-black text-white mb-6">Mentions Légales</h1>
           <p className="text-blue-100/80 max-w-2xl mx-auto leading-relaxed">
-            Informations obligatoires concernant l'éditeur et l'hébergeur de la plateforme Spass mit Deutsch Benin.
+            Informations obligatoires concernant l&apos;éditeur et l&apos;hébergeur de la plateforme Spass mit Deutsch Benin.
           </p>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function LegalMentions() {
               <h2 className="text-2xl font-bold">Propriété Intellectuelle</h2>
             </div>
             <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-              L'ensemble du contenu de cette plateforme (textes, logos, graphismes, icônes) est la propriété exclusive de Spass mit Deutsch Benin, sauf mention contraire. Toute reproduction, distribution ou modification, même partielle, est strictement interdite sans l'autorisation écrite préalable de l'éditeur.
+              L&apos;ensemble du contenu de cette plateforme (textes, logos, graphismes, icônes) est la propriété exclusive de Spass mit Deutsch Benin, sauf mention contraire. Toute reproduction, distribution ou modification, même partielle, est strictement interdite sans l&apos;autorisation écrite préalable de l&apos;éditeur.
             </p>
           </section>
 
@@ -99,7 +99,7 @@ export default function LegalMentions() {
           <section className="space-y-4">
             <h3 className="font-bold text-gray-800 dark:text-gray-200">Limitation de Responsabilité</h3>
             <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-              Spass mit Deutsch Benin s'efforce d'assurer l'exactitude des informations publiées. Toutefois, le centre ne pourra être tenu responsable des erreurs ou omissions, ainsi que de l'indisponibilité temporaire du service pour cause de maintenance technique.
+              Spass mit Deutsch Benin s&apos;efforce d&apos;assurer l&apos;exactitude des informations publiées. Toutefois, le centre ne pourra être tenu responsable des erreurs ou omissions, ainsi que de l&apos;indisponibilité temporaire du service pour cause de maintenance technique.
             </p>
           </section>
 

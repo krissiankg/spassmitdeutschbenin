@@ -159,7 +159,7 @@ export default function PlanningPage() {
 
       {enrollments.length === 0 && examSchedules.length === 0 && (
         <div className="p-10 bg-blue-50/50 rounded-[2rem] border border-dashed border-blue-100 text-center">
-          <p className="text-blue-900/60 font-bold">Vous n'avez pas encore d'inscriptions validées ni d'examens programmés.</p>
+          <p className="text-blue-900/60 font-bold">Vous n&apos;avez pas encore d&apos;inscriptions validées ni d&apos;examens programmés.</p>
         </div>
       )}
     </div>
