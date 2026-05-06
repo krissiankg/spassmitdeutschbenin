@@ -69,41 +69,77 @@ export async function generateInvoicePDF(candidate, user) {
     doc.text(`${candidate.session.level} - ${candidate.session.title}`, 45, 84);
   }
 
-  // Payment Details
+  // Items Breakdown
   doc.line(15, 92, 133, 92);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "bold");
+  doc.text("Désignation", 15, 98);
+  doc.text("Montant", 128, 98, { align: "right" });
+  doc.line(15, 100, 133, 100);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  let currentY = 105;
+
+  // 1. Enrollments
+  (candidate.enrollments || []).forEach(en => {
+    doc.text(`- ${en.course.name}`, 15, currentY);
+    doc.text(`${formatCurrency(en.course.price)} F`, 128, currentY, { align: "right" });
+    currentY += 5;
+  });
+
+  // 2. OSD Modules (handle both resolved and raw)
+  const osdModules = candidate.resolvedModules || (candidate.chosenModules || []).map(m => ({ label: `Module OSD: ${m}`, price: 0 }));
+  osdModules.forEach(m => {
+    doc.text(`- ${m.label}`, 15, currentY);
+    if (m.price) doc.text(`${formatCurrency(m.price)} F`, 128, currentY, { align: "right" });
+    currentY += 5;
+  });
+
+  // 3. Prep Courses
+  const prepCourses = candidate.resolvedPrep || (candidate.prepCourses || []).map(p => ({ label: `Préparatoire: ${p}`, price: 0 }));
+  prepCourses.forEach(p => {
+    doc.text(`- ${p.label}`, 15, currentY);
+    if (p.price) doc.text(`${formatCurrency(p.price)} F`, 128, currentY, { align: "right" });
+    currentY += 5;
+  });
+
+  // Payment Details
+  const startPaymentY = Math.max(currentY + 5, 125);
+  doc.line(15, startPaymentY, 133, startPaymentY);
   
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
-  doc.text("Détails du Paiement", 15, 102);
+  doc.text("Résumé financier", 15, startPaymentY + 8);
 
   doc.setFillColor(245, 245, 245);
-  doc.rect(15, 107, 118, 30, "F");
+  doc.rect(15, startPaymentY + 12, 118, 25, "F");
 
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text(`Total à payer :`, 20, 115);
+  doc.text(`Total à payer :`, 20, startPaymentY + 18);
   doc.setFont("helvetica", "bold");
-  doc.text(`${formatCurrency(candidate.totalAmount)} FCFA`, 128, 115, { align: "right" });
+  doc.text(`${formatCurrency(candidate.totalAmount)} FCFA`, 128, startPaymentY + 18, { align: "right" });
 
   doc.setFont("helvetica", "normal");
-  doc.text(`Montant versé :`, 20, 123);
+  doc.text(`Montant versé :`, 20, startPaymentY + 24);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(0, 128, 0);
-  doc.text(`${formatCurrency(candidate.amountPaid)} FCFA`, 128, 123, { align: "right" });
+  doc.text(`${formatCurrency(candidate.amountPaid)} FCFA`, 128, startPaymentY + 24, { align: "right" });
   doc.setTextColor(0);
 
-  doc.line(20, 127, 128, 127);
+  doc.line(20, startPaymentY + 28, 128, startPaymentY + 28);
 
   const remains = (candidate.totalAmount || 0) - (candidate.amountPaid || 0);
   doc.setFont("helvetica", "normal");
-  doc.text(`Reste à payer :`, 20, 133);
+  doc.text(`Reste à payer :`, 20, startPaymentY + 33);
   doc.setFont("helvetica", "bold");
   if (remains <= 0) {
     doc.setTextColor(0, 128, 0);
-    doc.text(`0 FCFA`, 128, 133, { align: "right" });
+    doc.text(`0 FCFA`, 128, startPaymentY + 33, { align: "right" });
   } else {
     doc.setTextColor(200, 0, 0);
-    doc.text(`${formatCurrency(remains)} FCFA`, 128, 133, { align: "right" });
+    doc.text(`${formatCurrency(remains)} FCFA`, 128, startPaymentY + 33, { align: "right" });
   }
   doc.setTextColor(0);
 
@@ -111,7 +147,7 @@ export async function generateInvoicePDF(candidate, user) {
   if (candidate.paymentStatus === "PAID") {
     doc.setFontSize(20);
     doc.setTextColor(0, 150, 0);
-    doc.text("SOLDÉ", 148/2, 157, { align: "center" });
+    doc.text("SOLDÉ", 148/2, startPaymentY + 50, { align: "center" });
     doc.setTextColor(0);
   }
 

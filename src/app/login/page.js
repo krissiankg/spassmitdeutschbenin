@@ -5,8 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Lock, Mail, Loader2, AlertCircle, ArrowRight, Home } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslations } from "@/hooks/useTranslations";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function LoginPage() {
+  const { t } = useTranslations();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,20 +20,20 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await signIn("credentials", {
+      const res = await signIn("admin-credentials", {
         redirect: false,
         email,
         password,
       });
 
       if (res?.error) {
-        toast.error(res.error || "Erreur d'authentification");
+        toast.error(res.error || t("auth.errorAuth"));
       } else {
-        toast.success("Connexion réussie !");
+        toast.success(t("auth.successLogin"));
         router.push("/admin/dashboard");
       }
     } catch (error) {
-      toast.error("Une erreur est survenue");
+      toast.error(t("auth.errorGeneral"));
     } finally {
       setLoading(false);
     }
@@ -43,22 +46,26 @@ export default function LoginPage() {
         className="absolute top-8 left-8 flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-[#003366] bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-md group"
       >
         <Home size={18} className="group-hover:scale-110 transition-transform" />
-        <span>Retour à l&apos;accueil</span>
+        <span>{t("auth.backHome")}</span>
       </Link>
+
+      <div className="absolute top-8 right-8 z-50">
+        <LanguageSwitcher />
+      </div>
 
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl shadow-xl shadow-blue-900/5 mb-6 group hover:scale-105 transition-transform duration-300">
             <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
           </div>
-          <h1 className="text-4xl font-bold text-[#003366] tracking-tight mb-2">Bienvenue</h1>
-          <p className="text-gray-500 font-medium">Espace Administration | Spass mit Deutsch</p>
+          <h1 className="text-4xl font-bold text-[#003366] tracking-tight mb-2">{t("auth.welcome")}</h1>
+          <p className="text-gray-500 font-medium">{t("auth.adminSpace")}</p>
         </div>
 
         <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-blue-900/10 border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Email Professionnel</label>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">{t("auth.emailLabel")}</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#003366] transition-colors">
                   <Mail size={20} />
@@ -76,8 +83,8 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center px-1">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Mot de passe</label>
-                <button type="button" className="text-[10px] font-bold text-[#003366] hover:underline uppercase tracking-tighter">Oublié ?</button>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("auth.passwordLabel")}</label>
+                <button type="button" className="text-[10px] font-bold text-[#003366] hover:underline uppercase tracking-tighter">{t("auth.forgotPassword")}</button>
               </div>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#003366] transition-colors">
@@ -103,7 +110,7 @@ export default function LoginPage() {
                 <Loader2 className="animate-spin" size={20} />
               ) : (
                 <>
-                  Se connecter <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  {t("auth.loginButton")} <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
@@ -113,14 +120,14 @@ export default function LoginPage() {
             <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
               <AlertCircle size={20} className="text-amber-600 shrink-0 mt-0.5" />
               <p className="text-[11px] text-amber-800 leading-relaxed font-medium">
-                Seuls les administrateurs et secrétaires autorisés peuvent accéder à cet espace. Toutes les tentatives de connexion sont enregistrées.
+                {t("auth.warningText")}
               </p>
             </div>
           </div>
         </div>
 
         <p className="text-center mt-10 text-gray-400 text-xs font-medium">
-          &copy; {new Date().getFullYear()} Spass mit Deutsch Benin. Tous droits réservés.
+          &copy; {new Date().getFullYear()} Spass mit Deutsch Benin. {t("auth.allRightsReserved")}
         </p>
       </div>
     </div>

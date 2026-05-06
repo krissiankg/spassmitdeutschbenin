@@ -11,8 +11,20 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 1. Total Candidates
-    const totalCandidates = await prisma.candidate.count();
+    // 1. Total Candidates (OSD only)
+    const totalCandidates = await prisma.candidate.count({
+      where: { formType: 'OSD' }
+    });
+
+    // 1b. Total Students (With LMS account)
+    const totalStudents = await prisma.candidate.count({
+      where: {
+        OR: [
+          { lmsPassword: { not: null } },
+          { formType: 'SIMPLE' }
+        ]
+      }
+    });
 
     // 2. Active Sessions (Not ARCHIVED)
     const activeSessionsCount = await prisma.session.count({
@@ -50,6 +62,7 @@ export async function GET() {
     // 6. Level Distribution
     const levelsQuery = await prisma.candidate.groupBy({
       by: ['level'],
+      where: { formType: 'OSD' },
       _count: { level: true }
     });
     const levelDistribution = levelsQuery.map(l => ({ name: l.level, value: l._count.level }));
@@ -87,6 +100,7 @@ export async function GET() {
     return NextResponse.json({
       stats: {
         totalCandidates,
+        totalStudents,
         activeSessions: activeSessionsCount,
         publishedResults: publishedResultsCount,
         pendingResults: pendingResultsCount

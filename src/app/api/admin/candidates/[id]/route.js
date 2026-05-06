@@ -44,6 +44,7 @@ export async function PUT(request, { params }) {
         consultationCode: body.consultationCode,
         level: body.level,
         sessionId: body.sessionId,
+        formType: body.formType,
         customData: body.customData || {}
       }
     });

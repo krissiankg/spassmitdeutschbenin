@@ -34,6 +34,7 @@ export async function POST(request) {
             level: c.level || "B2",
             center: c.center || "Cotonou",
             sessionId: sessionId,
+            formType: c.formType || "OSD",
             consultationCode: c.consultationCode || Math.random().toString(36).substring(2, 10).toUpperCase(),
           },
           create: {
@@ -44,6 +45,7 @@ export async function POST(request) {
             level: c.level || "B2",
             center: c.center || "Cotonou",
             sessionId: sessionId,
+            formType: c.formType || "OSD",
             consultationCode: c.consultationCode || Math.random().toString(36).substring(2, 10).toUpperCase(),
           },
         });

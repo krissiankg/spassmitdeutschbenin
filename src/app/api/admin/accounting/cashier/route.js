@@ -42,7 +42,14 @@ export async function GET(req) {
           paymentStatus: true,
           createdAt: true,
           level: true,
-          session: { select: { title: true, level: true } }
+          formType: true,
+          chosenModules: true,
+          prepCourses: true,
+          session: { select: { title: true, level: true } },
+          enrollments: {
+            where: { status: "APPROVED" },
+            include: { course: true }
+          }
         },
         orderBy: { createdAt: 'desc' },
         skip,

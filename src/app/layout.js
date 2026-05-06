@@ -15,6 +15,7 @@ export const metadata = {
 };
 
 import { Providers } from "./providers";
+import { CookieConsent } from "@/components/CookieConsent";
 
 export default function RootLayout({ children }) {
   return (
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
       <body className="font-sans">
         <Providers>
           <Toaster position="top-right" />
+          <CookieConsent />
           {children}
         </Providers>
       </body>

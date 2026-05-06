@@ -11,12 +11,11 @@ export async function GET() {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    let settings = await prisma.formSettings.findUnique({ where: { id: "global" } });
-    if (!settings) {
-      settings = await prisma.formSettings.create({
-        data: { id: "global", isOpen: true, closingMessage: "Les inscriptions sont actuellement fermées." }
-      });
-    }
+    let settings = await prisma.formSettings.upsert({
+      where: { id: "global" },
+      update: {},
+      create: { id: "global", isOpen: true, closingMessage: "Les inscriptions sont actuellement fermées.", simpleFormActive: true, osdFormActive: false }
+    });
 
     const fields = await prisma.formField.findMany({
       orderBy: { order: 'asc' }
@@ -53,9 +52,11 @@ export async function POST(req) {
       const updated = await prisma.formSettings.update({
         where: { id: "global" },
         data: { 
-          isOpen: payload.isOpen, 
-          closingMessage: payload.closingMessage,
-          activeSessions: payload.activeSessions
+          isOpen: payload.isOpen ?? true,
+          closingMessage: payload.closingMessage || "",
+          activeSessions: payload.activeSessions || [],
+          simpleFormActive: payload.simpleFormActive ?? true,
+          osdFormActive: payload.osdFormActive ?? false,
         }
       });
       return NextResponse.json(updated);

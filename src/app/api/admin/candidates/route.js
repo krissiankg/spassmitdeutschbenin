@@ -4,17 +4,26 @@ import prisma from "@/lib/prisma";
 export const dynamic = 'force-dynamic';
 import { generateCode } from "@/lib/utils";
 
+import { getAuthSession } from "@/lib/auth";
+
 export async function GET(request) {
+  const sessionAuth = await getAuthSession();
+  if (!sessionAuth || (sessionAuth.user.role !== "SUPER_ADMIN" && sessionAuth.user.role !== "ACCOUNTANT" && sessionAuth.user.role !== "SECRETARY")) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get('page')) || 1;
   const limit = parseInt(searchParams.get('limit')) || 25;
   const search = searchParams.get('search') || "";
   const level = searchParams.get('level') || "All";
   const sessionId = searchParams.get('sessionId') || "All";
+  const type = searchParams.get('type') || "OSD"; // Default to OSD for backward compatibility with the candidates page
   const skip = (page - 1) * limit;
 
   try {
     const where = {};
+    if (type !== "All") where.formType = type;
     if (sessionId !== "All") where.sessionId = sessionId;
     if (level !== "All") where.level = level;
     if (search) {
@@ -26,7 +35,7 @@ export async function GET(request) {
       ];
     }
 
-    const [candidates, total] = await Promise.all([
+    const [candidatesRaw, total] = await Promise.all([
       prisma.candidate.findMany({
         where,
         include: {
@@ -39,6 +48,12 @@ export async function GET(request) {
       }),
       prisma.candidate.count({ where })
     ]);
+
+    // Omit sensitive fields from the response
+    const candidates = candidatesRaw.map(c => {
+      const { lmsPassword, resetToken, twoFactorSecret, ...safeCandidate } = c;
+      return safeCandidate;
+    });
 
     return NextResponse.json({
       candidates,
@@ -55,6 +70,11 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const sessionAuth = await getAuthSession();
+    if (!sessionAuth || (sessionAuth.user.role !== "SUPER_ADMIN" && sessionAuth.user.role !== "SECRETARY")) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
     const body = await request.json();
     
     // Check constraints
@@ -76,6 +96,7 @@ export async function POST(request) {
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
         level: body.level,
         sessionId: body.sessionId,
+        formType: body.formType || "OSD",
         consultationCode: body.consultationCode || generateCode()
       }
     });

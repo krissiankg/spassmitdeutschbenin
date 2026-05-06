@@ -45,9 +45,13 @@ export async function POST(req) {
       const totalAmount = candidate.totalAmount || 0;
       
       let status = "UNPAID";
-      if (newAmountPaid > 0 && newAmountPaid < totalAmount) status = "PARTIAL";
-      else if (newAmountPaid >= totalAmount && totalAmount > 0) status = "PAID";
-      else if (newAmountPaid > 0 && totalAmount === 0) status = "PAID"; // Cas sans total défini
+      if (totalAmount <= 0) {
+        status = "PAID";
+      } else if (newAmountPaid >= totalAmount) {
+        status = "PAID";
+      } else if (newAmountPaid > 0) {
+        status = "PARTIAL";
+      }
 
       return await tx.candidate.update({
         where: { id: candidateId },
@@ -66,6 +70,16 @@ export async function POST(req) {
       targetId: candidateId,
       targetName: `${updatedCandidate.firstName} ${updatedCandidate.lastName}`,
       details: { amount, method, reference }
+    });
+
+    // Notification Étudiant
+    await prisma.notification.create({
+      data: {
+        recipientCandidateId: candidateId,
+        title: "Paiement Reçu",
+        message: `Nous avons bien reçu votre paiement de ${amount} FCFA par ${method}. Nouveau statut: ${updatedCandidate.paymentStatus}.`,
+        type: "SUCCESS"
+      }
     });
 
     // Send Payment Email async

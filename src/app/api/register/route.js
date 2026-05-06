@@ -30,6 +30,7 @@ export async function POST(req) {
     const selectedModulesStr = formData.get('selectedModules');
     const selectedPrepCoursesStr = formData.get('selectedPrepCourses');
     const customDataStr = formData.get('customData');
+    const formType = formData.get('formType') || 'SIMPLE'; // SIMPLE ou OSD
 
     let selectedLevels = [];
     let selectedModules = [];
@@ -102,6 +103,24 @@ export async function POST(req) {
     
     let candidateSequenceCounter = await prisma.candidate.count();
     const { sendRegistrationEmail } = await import("@/lib/email");
+    const bcrypt = await import("bcryptjs");
+
+    // Génération du mot de passe LMS (unique pour tous les niveaux de ce candidat)
+    const generateLmsPassword = () => {
+      const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+      const lower = 'abcdefghjkmnpqrstuvwxyz';
+      const digits = '23456789';
+      const special = '@#!';
+      const all = upper + lower + digits + special;
+      let pwd = upper[Math.floor(Math.random() * upper.length)]
+              + lower[Math.floor(Math.random() * lower.length)]
+              + digits[Math.floor(Math.random() * digits.length)]
+              + special[Math.floor(Math.random() * special.length)];
+      for (let i = 0; i < 5; i++) pwd += all[Math.floor(Math.random() * all.length)];
+      return pwd.split('').sort(() => Math.random() - 0.5).join('');
+    };
+    const lmsPasswordClear = generateLmsPassword();
+    const lmsPasswordHash = await bcrypt.default.hash(lmsPasswordClear, 10);
 
     for (const lvl of selectedLevels) {
        // Filter modules/courses belonging to this specific level
@@ -125,37 +144,54 @@ export async function POST(req) {
            idIssueDate: idIssueDate ? new Date(idIssueDate) : null,
            idExpiryDate: idExpiryDate ? new Date(idExpiryDate) : null,
            phone, email, sessionId, documentUrl,
-           level: lvl, // SCINDÉ : 1 niveau par dossier
-           chosenModules: lvlModules, // Array PostgreSQL
-           prepCourses: lvlCourses, // Array PostgreSQL
+           level: lvl,
+           chosenModules: lvlModules,
+           prepCourses: lvlCourses,
            totalAmount: partialTotal,
            candidateNumber,
            consultationCode,
            status: "PENDING",
-           customData
+           customData,
+           formType,        // SIMPLE ou OSD
+           lmsPassword: lmsPasswordHash // Mot de passe hashé
          }
        });
        createdIds.push(c.id);
 
-       // Send Welcome Email
+       // Envoi email avec identifiants LMS (mot de passe en clair seulement au 1er niveau)
        if (email) {
           try {
-            await sendRegistrationEmail(c);
+            const pwdToSend = createdIds.length === 1 ? lmsPasswordClear : null;
+            await sendRegistrationEmail({ ...c, formType }, pwdToSend);
           } catch(e) {
             console.error("Erreur envoi mail welcome:", e);
           }
        }
     }
 
-    // Create Notification about the complex basket
-    const levelsTitle = selectedLevels.join(" et ");
-    await prisma.notification.create({
-      data: {
+    // Créer des notifications dans le tableau de bord pour TOUS les admins
+    try {
+      const { createAdminNotification } = await import("@/lib/notifications");
+      await createAdminNotification({
         title: "Nouvelle pré-inscription " + (selectedLevels.length > 1 ? "Multi-Niveaux" : ""),
-        message: `${firstName} ${lastName} vient de s'inscrire pour : ${levelsTitle}. (Réparti en ${selectedLevels.length} dossier(s)).`,
+        message: `${firstName} ${lastName} vient de s'inscrire pour : ${levelsTitle}.`,
         type: "SUCCESS"
-      }
-    });
+      });
+    } catch (e) {
+      console.error("Erreur création notification dashboard admin:", e);
+    }
+
+    // Notification par Email aux admins
+    try {
+      const { sendAdminNotificationEmail } = await import("@/lib/email");
+      await sendAdminNotificationEmail(
+        { firstName, lastName, email, phone, formType, sessionId },
+        selectedLevels,
+        pricings
+      );
+    } catch (e) {
+      console.error("Erreur notification email admin:", e);
+    }
 
     return NextResponse.json({ success: true, createdIds });
   } catch (err) {

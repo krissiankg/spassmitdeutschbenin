@@ -20,8 +20,26 @@ export function formatDate(date) {
 }
 
 /**
- * Generate a unique consultation code.
+ * Generate a robust temporary password for LMS.
  */
-export function generateCode() {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
+export function generateLmsPassword() {
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghjkmnpqrstuvwxyz';
+  const digits = '23456789';
+  const special = '@#!';
+  const all = upper + lower + digits + special;
+  
+  // Ensure at least one of each type
+  let pwd = upper[Math.floor(Math.random() * upper.length)]
+          + lower[Math.floor(Math.random() * lower.length)]
+          + digits[Math.floor(Math.random() * digits.length)]
+          + special[Math.floor(Math.random() * special.length)];
+          
+  // Add 5 more random characters
+  for (let i = 0; i < 5; i++) {
+    pwd += all[Math.floor(Math.random() * all.length)];
+  }
+  
+  // Shuffle
+  return pwd.split('').sort(() => Math.random() - 0.5).join('');
 }

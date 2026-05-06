@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 
 export default function FormBuilderPage() {
   const [fields, setFields] = useState([]);
-  const [settings, setSettings] = useState({ isOpen: true, closingMessage: "", activeSessions: [] });
+  const [settings, setSettings] = useState({ isOpen: true, closingMessage: "", activeSessions: [], simpleFormActive: true, osdFormActive: false });
   const [loading, setLoading] = useState(true);
   
   const [dbSessions, setDbSessions] = useState([]);
@@ -28,7 +28,9 @@ export default function FormBuilderPage() {
         setSettings({
             isOpen: data.settings.isOpen,
             closingMessage: data.settings.closingMessage,
-            activeSessions: data.settings.activeSessions || []
+            activeSessions: data.settings.activeSessions || [],
+            simpleFormActive: data.settings.simpleFormActive ?? true,
+            osdFormActive: data.settings.osdFormActive ?? false
         });
         setFields(data.fields);
         setDbSessions(data.sessionsData || []);
@@ -51,7 +53,13 @@ export default function FormBuilderPage() {
       const res = await fetch("/api/admin/form-builder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "TOGGLE_PORTAL", payload: { isOpen: settings.isOpen, closingMessage: settings.closingMessage, activeSessions: settings.activeSessions } })
+        body: JSON.stringify({ action: "TOGGLE_PORTAL", payload: {
+          isOpen: settings.isOpen,
+          closingMessage: settings.closingMessage || "",
+          activeSessions: settings.activeSessions,
+          simpleFormActive: settings.simpleFormActive,
+          osdFormActive: settings.osdFormActive
+        }})
       });
       if (res.ok) {
         toast.success("Paramètres d'accès sauvegardés !");
@@ -69,7 +77,13 @@ export default function FormBuilderPage() {
     await fetch("/api/admin/form-builder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "TOGGLE_PORTAL", payload: { isOpen: settings.isOpen, closingMessage: settings.closingMessage, activeSessions: newList } })
+        body: JSON.stringify({ action: "TOGGLE_PORTAL", payload: {
+          isOpen: settings.isOpen,
+          closingMessage: settings.closingMessage || "",
+          activeSessions: newList,
+          simpleFormActive: settings.simpleFormActive,
+          osdFormActive: settings.osdFormActive
+        }})
     });
   };
 
@@ -203,6 +217,54 @@ export default function FormBuilderPage() {
         </div>
       )}
 
+      {/* CONTRÔLE DES FORMULAIRES */}
+      <div className="bg-white dark:bg-[#121212] rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
+        <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-4">Activation des Formulaires Publics</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            { key: 'simpleFormActive', icon: '📚', label: 'Formulaire Simple', desc: 'Cours réguliers — toute l\'année', href: '/register/simple', color: '#003366' },
+            { key: 'osdFormActive', icon: '🎓', label: 'Formulaire ÖSD', desc: 'Examens ÖSD — période spéciale', href: '/register/osd', color: '#D4AF37' }
+          ].map(({ key, icon, label, desc, href, color }) => {
+            const isOn = settings[key];
+            return (
+              <div key={key} className={`p-5 rounded-2xl border-2 transition-all ${isOn ? 'border-green-400 bg-green-50/30 dark:bg-green-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#1A1A1A]'}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{icon}</span>
+                    <span className="font-bold text-sm text-gray-800 dark:text-gray-200">{label}</span>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      const next = { ...settings, [key]: !isOn };
+                      setSettings(next);
+                      await fetch('/api/admin/form-builder', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'TOGGLE_PORTAL', payload: { isOpen: settings.isOpen, closingMessage: settings.closingMessage, activeSessions: settings.activeSessions, simpleFormActive: next.simpleFormActive, osdFormActive: next.osdFormActive } })
+                      });
+                      toast.success(`${label} ${!isOn ? 'activé' : 'désactivé'}`);
+                    }}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${isOn ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+                  >
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${isOn ? 'left-7' : 'left-1'}`}/>
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{desc}</p>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isOn ? 'bg-green-100 text-green-700' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
+                    {isOn ? '● Actif' : '○ Inactif'}
+                  </span>
+                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-500 hover:underline">
+                    Voir →
+                  </a>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">⚠️ Ces toggles contrôlent la disponibilité de chaque formulaire sur la page publique <strong>/register</strong>. Un formulaire inactif apparaît grisé et non-cliquable.</p>
+      </div>
+
       <div className="bg-white dark:bg-[#121212] rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-800">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-[#003366] dark:text-gray-100 flex items-center gap-2">
@@ -221,9 +283,9 @@ export default function FormBuilderPage() {
            <h4 className="font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-widest mb-3 border-b border-gray-100 dark:border-gray-800 pb-2">Champs Systèmes (Inamovibles)</h4>
            {[
              { label: "1. Identité Officielle (Nom, Prénom, Naissance, Contact)", type: "BLOC SYSTÈME", configurable: false },
-             { label: "2. Document d&apos;Identité (N° Pièce, Validité, Pièce jointe)", type: "BLOC SYSTÈME", configurable: false },
+             { label: "2. Document d'Identité (N° Pièce, Validité, Pièce jointe)", type: "BLOC SYSTÈME", configurable: false },
              { label: "3. Choix de(s) Session(s) et Niveaux", type: "BLOC SYSTÈME", configurable: true, cType: 'SESSIONS' },
-             { label: "4. Sélection des Modules d&apos;Examens et Calcul de Prix", type: "BLOC SYSTÈME", configurable: true, cType: 'PRICINGS' },
+             { label: "4. Sélection des Modules d'Examens et Calcul de Prix", type: "BLOC SYSTÈME", configurable: true, cType: 'PRICINGS' },
            ].map((sys, idx) => (
              <div key={`sys_${idx}`} className={`flex items-center justify-between p-4 bg-gray-50/50 dark:bg-[#1A1A1A] rounded-xl border border-gray-100 dark:border-gray-800 ${!sys.configurable ? 'opacity-80 cursor-not-allowed' : ''}`}>
                <div className="flex items-center gap-4">
@@ -343,9 +405,10 @@ export default function FormBuilderPage() {
           <div className="absolute inset-0 bg-black/40 dark:bg-black/80 backdrop-blur-sm" onClick={() => setIsConfigModal(false)}></div>
           <div className="relative bg-white dark:bg-[#121212] rounded-3xl p-8 w-full max-w-lg shadow-2xl max-h-[80vh] overflow-hidden flex flex-col">
             <h3 className="text-xl font-bold text-[#003366] dark:text-gray-100 mb-1">
-                {configType === 'SESSIONS' ? "Sessions d&apos;Examens Proposées" : "Modules & Tarifs Proposés"}
+                {configType === 'SESSIONS' ? "Sessions d'Examens Proposées" : "Modules & Tarifs Proposés"}
+
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">Sélectionnez ce qui doit être disponible sur le formulaire d&apos;inscription public actuellement.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">Sélectionnez ce qui doit être disponible sur le formulaire d'inscription public actuellement.</p>
             
             <div className="overflow-y-auto pr-2 space-y-3 flex-1 mb-6">
                 {configType === 'SESSIONS' && dbSessions.length === 0 && <p className="text-center text-gray-400 dark:text-gray-500 py-10">Aucune session créée dans le système.</p>}

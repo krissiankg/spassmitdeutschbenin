@@ -39,9 +39,32 @@ model Candidate {
 
   customData       Json?    // Réponses dynamiques issues du Form Builder
 
+  // Compte LMS étudiant
+  lmsPassword      String?  // Mot de passe hashé (bcrypt) pour /lms/login
+  resetToken       String?  @unique
+  resetTokenExpiry DateTime?
+  formType         String   @default("SIMPLE") // SIMPLE ou OSD
+  
+  // 2FA
+  twoFactorEnabled Boolean  @default(false)
+  twoFactorSecret  String?
+
+
   results          Result[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  // Cours et Inscriptions
+  enrollments      Enrollment[]
+
+  // Messagerie
+  participants     Participant[]
+  sentMessages     Message[]     @relation("SentMessagesCandidate")
+  notifications    Notification[]
+  
+  // Friend Requests
+  sentFriendRequests     FriendRequest[] @relation("SentFriendRequests")
+  receivedFriendRequests FriendRequest[] @relation("ReceivedFriendRequests")
 }
 
 model Pricing {
@@ -79,8 +102,16 @@ model Notification {
   id        String   @id @default(cuid())
   title     String
   message   String
-  type      String   @default("INFO") // INFO, SUCCESS, WARNING
+  type      String   @default("INFO") // INFO, SUCCESS, WARNING, MESSAGE
   isRead    Boolean  @default(false)
+  
+  // Destinataires optionnels
+  recipientAdminId     String?
+  recipientAdmin       Admin?     @relation(fields: [recipientAdminId], references: [id], onDelete: Cascade)
+  
+  recipientCandidateId String?
+  recipientCandidate   Candidate? @relation(fields: [recipientCandidateId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
 }
 
@@ -92,8 +123,25 @@ model Session {
   status     String      @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
   candidates Candidate[]
   results    Result[]
+  schedules  ExamSchedule[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+}
+
+model ExamSchedule {
+  id         String   @id @default(cuid())
+  sessionId  String
+  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  moduleId   String
+  module     Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  date       DateTime
+  timeStart  String
+  timeEnd    String
+  room       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([sessionId, moduleId])
 }
 
 model Module {
@@ -104,6 +152,7 @@ model Module {
   maxScore  Float         @default(20.0)
   level     String
   scores    ModuleScore[]
+  schedules ExamSchedule[]
 }
 
 model Admin {
@@ -112,6 +161,11 @@ model Admin {
   email    String @unique
   password String
   role     String @default("SECRETARY") // SUPER_ADMIN, SECRETARY, ACCOUNTANT
+
+  // Messagerie
+  participants     Participant[]
+  sentMessages     Message[]     @relation("SentMessagesAdmin")
+  notifications    Notification[]
 }
 
 model Result {
@@ -145,10 +199,12 @@ model ModuleScore {
 // FORM BUILDER DYNAMIQUE (Option A)
 // ----------------------------------------------------
 model FormSettings {
-  id             String   @id @default("global") // Un seul enregistrement global
-  isOpen         Boolean  @default(true)
-  closingMessage String   @default("Les inscriptions sont actuellement fermées.")
-  activeSessions String[] @default([]) // Nouveauté : contrôle des sessions actives
+  id               String   @id @default("global")
+  isOpen           Boolean  @default(true)
+  closingMessage   String   @default("Les inscriptions sont actuellement fermées.")
+  activeSessions   String[] @default([])
+  simpleFormActive Boolean  @default(true)  // Formulaire cours réguliers
+  osdFormActive    Boolean  @default(false) // Formulaire examens ÖSD
 }
 
 model FormField {
@@ -174,3 +230,106 @@ model AuditLog {
   createdAt   DateTime @default(now())
 }
 
+// ----------------------------------------------------
+// SYSTEME DE MESSAGERIE
+// ----------------------------------------------------
+
+model Conversation {
+  id           String        @id @default(cuid())
+  participants Participant[]
+  messages     Message[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Participant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  candidateId    String?
+  candidate      Candidate?   @relation(fields: [candidateId], references: [id])
+  
+  adminId        String?
+  admin          Admin?       @relation(fields: [adminId], references: [id])
+
+  @@unique([conversationId, candidateId])
+  @@unique([conversationId, adminId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  content        String       @db.Text
+  createdAt      DateTime     @default(now())
+  
+  senderCandidateId String?
+  senderCandidate   Candidate? @relation("SentMessagesCandidate", fields: [senderCandidateId], references: [id])
+  
+  senderAdminId     String?
+  senderAdmin       Admin?     @relation("SentMessagesAdmin", fields: [senderAdminId], references: [id])
+
+  isRead         Boolean      @default(false)
+  
+  // Pièces jointes
+  attachmentUrl  String?
+  attachmentType String?
+  attachmentName String?
+}
+
+// ----------------------------------------------------
+// GESTION DES COURS RÉGULIERS
+// ----------------------------------------------------
+
+model Course {
+  id          String   @id @default(cuid())
+  name        String
+  level       String   // A1, A2, B1, B2, C1
+  description String?  @db.Text
+  price       Int
+  duration    String   // e.g., "8 semaines"
+  days        String[] // ["Lundi", "Mercredi", "Vendredi"]
+  timeStart   String?  // "08:00"
+  timeEnd     String?  // "10:00"
+  isActive    Boolean  @default(true)
+  
+  enrollments Enrollment[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  status      String    @default("PENDING") // PENDING, APPROVED, REJECTED, COMPLETED
+  enrolledAt  DateTime  @default(now())
+  approvedAt  DateTime?
+  
+  // Pour le certificat final
+  finalGrade  String?
+  certificateUrl String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([candidateId, courseId])
+}
+
+model FriendRequest {
+  id          String    @id @default(cuid())
+  senderId    String
+  sender      Candidate @relation("SentFriendRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    Candidate @relation("ReceivedFriendRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+  status      String    @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([senderId, receiverId])
+}

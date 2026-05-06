@@ -5,7 +5,7 @@ import { testSMTPSettings } from "@/lib/email";
 export async function POST(req) {
   try {
     const session = await getAuthSession();
-    if (!session || session.user.role !== "SUPER_ADMIN") {
+    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "SECRETARY")) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 

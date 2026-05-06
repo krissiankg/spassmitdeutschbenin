@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     let settings = await prisma.formSettings.findUnique({ where: { id: "global" } });
-    if (!settings) settings = { isOpen: true, closingMessage: "", activeSessions: [] };
+    if (!settings) settings = { isOpen: true, closingMessage: "", activeSessions: [], simpleFormActive: true, osdFormActive: false };
 
     const fields = await prisma.formField.findMany({
       orderBy: { order: 'asc' }

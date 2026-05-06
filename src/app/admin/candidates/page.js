@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { Plus, Search, Upload, Download, Filter, MoreVertical, Mail, Phone, Calendar, UserPlus, X, Loader2, Check, AlertCircle, Edit2, Wand2, ArrowDownUp, AlertTriangle, FileSpreadsheet } from "lucide-react";
+import { Plus, Search, Upload, Download, Filter, MoreVertical, Mail, Phone, Calendar, UserPlus, X, Loader2, Check, AlertCircle, Edit2, Wand2, ArrowDownUp, AlertTriangle, FileSpreadsheet, MessageSquare, ShieldCheck, ShieldOff, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Pagination from "@/components/Pagination";
 
@@ -12,13 +12,13 @@ export default function CandidatesPage() {
   const [filterSession, setFilterSession] = useState("All");
   const [dbSessions, setDbSessions] = useState([]);
   const [customFields, setCustomFields] = useState([]);
-  
+
   // Pagination State
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(25);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  
+
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importData, setImportData] = useState([]);
   const [selectedSessionId, setSelectedSessionId] = useState("");
@@ -34,9 +34,9 @@ export default function CandidatesPage() {
 
   // Table Management State
   const [sortConfig, setSortConfig] = useState(null);
-  const [showIncompleteOnly, setShowIncompleteOnly] = useState(false);
+  const [filterCompleteness, setFilterCompleteness] = useState("All"); // "All" | "INCOMPLETE" | "COMPLETE"
   const [selectedIds, setSelectedIds] = useState(new Set());
-  
+
   const fileInputRef = useRef(null);
 
   const loadCandidates = React.useCallback(async () => {
@@ -49,7 +49,7 @@ export default function CandidatesPage() {
         level: filterLevel,
         sessionId: filterSession === "All" ? "All" : dbSessions.find(s => s.title === filterSession)?.id || "All"
       });
-      
+
       const res = await fetch(`/api/admin/candidates?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
@@ -84,7 +84,7 @@ export default function CandidatesPage() {
         const data = await res.json();
         setCustomFields(data.fields);
       }
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   useEffect(() => {
@@ -135,7 +135,7 @@ export default function CandidatesPage() {
     const chars = '0123456789';
     let result = 'SMD-';
     for (let i = 0; i < 6; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
   };
@@ -144,7 +144,7 @@ export default function CandidatesPage() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let result = '';
     for (let i = 0; i < 6; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
   };
@@ -186,6 +186,29 @@ export default function CandidatesPage() {
     }
   };
 
+  const handleDeleteCandidate = async (id, name) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer définitivement ${name} ? Cette action supprimera également ses résultats et paiements associés.`)) {
+      return;
+    }
+
+    const toastId = toast.loading("Suppression en cours...");
+    try {
+      const res = await fetch(`/api/admin/candidates/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        toast.success("Candidat supprimé avec succès", { id: toastId });
+        loadCandidates();
+      } else {
+        const error = await res.json();
+        toast.error(error.error || "Erreur lors de la suppression", { id: toastId });
+      }
+    } catch (err) {
+      toast.error("Erreur réseau", { id: toastId });
+    }
+  };
+
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -194,7 +217,7 @@ export default function CandidatesPage() {
     try {
       const { read, utils } = await import("xlsx");
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         try {
           const data = new Uint8Array(e.target.result);
@@ -266,17 +289,37 @@ export default function CandidatesPage() {
     }
   };
 
+  // Un candidat est "incomplet" s'il manque email ou numéro candidat ou mot de passe LMS
+  const isIncomplete = (c) => !c.email || !c.candidateNumber || !c.lmsPassword;
+
+  // Retourne les champs manquants pour affichage
+  const getMissingFields = (c) => {
+    const missing = [];
+    if (!c.email) missing.push('Email');
+    if (!c.candidateNumber) missing.push('N° Candidat');
+    if (!c.lmsPassword) missing.push('Accès LMS');
+    return missing;
+  };
+
   const processedCandidates = useMemo(() => {
-    // In server-side pagination, 'candidates' is already filtered by the API.
-    // We only apply client-side sorting if needed or just use the API order.
     let result = [...candidates];
 
+    if (filterCompleteness === "INCOMPLETE") {
+      // Trier : incomplets EN HAUT, complets en bas
+      result.sort((a, b) => {
+        const aInc = isIncomplete(a) ? 0 : 1;
+        const bInc = isIncomplete(b) ? 0 : 1;
+        return aInc - bInc;
+      });
+    } else if (filterCompleteness === "COMPLETE") {
+      result = result.filter(c => !isIncomplete(c));
+    }
+
+    // Tri colonne
     if (sortConfig !== null) {
       result.sort((a, b) => {
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
-        // ... (sorting logic remains same if we want to sort the current page only, 
-        // or we could add sorting to the API later)
+        let aValue = a[sortConfig.key] || '';
+        let bValue = b[sortConfig.key] || '';
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
@@ -284,7 +327,7 @@ export default function CandidatesPage() {
     }
 
     return result;
-  }, [candidates, sortConfig]);
+  }, [candidates, sortConfig, filterCompleteness]);
 
   const toggleSort = (key) => {
     let direction = 'asc';
@@ -315,19 +358,19 @@ export default function CandidatesPage() {
       const { utils, writeFile } = await import("xlsx");
       const selected = candidates.filter(c => selectedIds.has(c.id));
       const dataToExport = selected.map(c => ({
-         Prenom: c.firstName,
-         Nom: c.lastName,
-         Email: c.email || "",
-         Numero_Candidat: c.candidateNumber || "",
-         Code_Consultation: c.consultationCode || "",
-         Niveau: c.level,
-         Session: c.session?.title || "Sans Session",
-         Sexe: c.gender || "",
-         Date_Naissance: c.dateOfBirth ? new Date(c.dateOfBirth).toLocaleDateString() : "",
-         Statut_Paiement: c.paymentStatus || "",
-         Montant_Total: c.totalAmount || 0,
-         Montant_Paye: c.amountPaid || 0,
-         ...c.customData
+        Prenom: c.firstName,
+        Nom: c.lastName,
+        Email: c.email || "",
+        Numero_Candidat: c.candidateNumber || "",
+        Code_Consultation: c.consultationCode || "",
+        Niveau: c.level,
+        Session: c.session?.title || "Sans Session",
+        Sexe: c.gender || "",
+        Date_Naissance: c.dateOfBirth ? new Date(c.dateOfBirth).toLocaleDateString() : "",
+        Statut_Paiement: c.paymentStatus || "",
+        Montant_Total: c.totalAmount || 0,
+        Montant_Paye: c.amountPaid || 0,
+        ...c.customData
       }));
       const ws = utils.json_to_sheet(dataToExport);
       const wb = utils.book_new();
@@ -350,20 +393,20 @@ export default function CandidatesPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-            className="hidden" 
-            accept=".csv,.xlsx" 
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+            accept=".csv,.xlsx"
           />
-          <button 
+          <button
             onClick={handleImportClick}
             className="btn-secondary flex items-center gap-2 text-sm"
           >
             <Upload size={18} /> Import Excel/CSV
           </button>
-          <button 
+          <button
             onClick={() => openEditModal()}
             className="btn-primary flex items-center gap-2 text-sm shadow-lg shadow-blue-900/10"
           >
@@ -376,57 +419,65 @@ export default function CandidatesPage() {
       <div className="card-premium p-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
-          <input 
-            type="text" 
-            placeholder="Rechercher un candidat..." 
+          <input
+            type="text"
+            placeholder="Rechercher un candidat..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-[#1E1E1E] text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-[#003366] dark:focus:ring-gray-600 transition-all outline-none text-sm"
           />
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">Niveau:</span>
-            <select 
-                value={filterLevel}
-                onChange={(e) => setFilterLevel(e.target.value)}
-                className="text-xs bg-gray-50 dark:bg-[#1E1E1E] text-gray-900 dark:text-gray-100 border border-gray-100 dark:border-gray-800 rounded-lg px-2 py-1.5 focus:ring-1 focus:ring-[#003366] outline-none"
+            <select
+              value={filterLevel}
+              onChange={(e) => setFilterLevel(e.target.value)}
+              className="text-xs bg-gray-50 dark:bg-[#1E1E1E] text-gray-900 dark:text-gray-100 border border-gray-100 dark:border-gray-800 rounded-lg px-2 py-1.5 focus:ring-1 focus:ring-[#003366] outline-none"
             >
-                {["All", "A1", "A2", "B1", "B2"].map(l => <option key={l} value={l}>{l === 'All' ? 'Tous' : l}</option>)}
+              {["All", "A1", "A2", "B1", "B2"].map(l => <option key={l} value={l}>{l === 'All' ? 'Tous' : l}</option>)}
             </select>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">Session:</span>
-            <select 
-                value={filterSession}
-                onChange={(e) => setFilterSession(e.target.value)}
-                className="text-xs bg-gray-50 dark:bg-[#1E1E1E] text-gray-900 dark:text-gray-100 border border-gray-100 dark:border-gray-800 rounded-lg px-2 py-1.5 focus:ring-1 focus:ring-[#003366] outline-none max-w-[150px]"
+            <select
+              value={filterSession}
+              onChange={(e) => setFilterSession(e.target.value)}
+              className="text-xs bg-gray-50 dark:bg-[#1E1E1E] text-gray-900 dark:text-gray-100 border border-gray-100 dark:border-gray-800 rounded-lg px-2 py-1.5 focus:ring-1 focus:ring-[#003366] outline-none max-w-[150px]"
             >
-                <option value="All">Toutes</option>
-                {[...new Set(candidates.map(c => c.session?.title).filter(Boolean))].map(s => <option key={s} value={s}>{s}</option>)}
+              <option value="All">Toutes</option>
+              {[...new Set(candidates.map(c => c.session?.title).filter(Boolean))].map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
 
-          <button 
-            onClick={() => setShowIncompleteOnly(!showIncompleteOnly)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${
-              showIncompleteOnly ? "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/50" : "bg-white dark:bg-[#1E1E1E] text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-600 dark:hover:text-orange-400"
-            }`}
-            title="Afficher les dossiers incomplets"
+          <button
+            onClick={() => setFilterCompleteness(filterCompleteness === "INCOMPLETE" ? "All" : "INCOMPLETE")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${filterCompleteness === "INCOMPLETE" ? "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/50" : "bg-white dark:bg-[#1E1E1E] text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-600 dark:hover:text-orange-400"
+              }`}
+            title="Trier les dossiers incomplets en haut (email ou N° candidat manquant)"
           >
-            <AlertTriangle size={14} /> Incomplets
+            <AlertTriangle size={14} /> Incomplets en haut
           </button>
 
-          {(filterLevel !== "All" || filterSession !== "All" || searchTerm !== "" || showIncompleteOnly) && (
-              <button 
-                onClick={() => {setSearchTerm(""); setFilterLevel("All"); setFilterSession("All"); setShowIncompleteOnly(false);}}
-                className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-                title="Réinitialiser les filtres"
-              >
-                <X size={16} />
-              </button>
+          <button
+            onClick={() => setFilterCompleteness(filterCompleteness === "COMPLETE" ? "All" : "COMPLETE")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${filterCompleteness === "COMPLETE" ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50" : "bg-white dark:bg-[#1E1E1E] text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+              }`}
+            title="Afficher uniquement les dossiers complets"
+          >
+            <Check size={14} /> Complets
+          </button>
+
+          {(filterLevel !== "All" || filterSession !== "All" || searchTerm !== "" || filterCompleteness !== "All") && (
+            <button
+              onClick={() => { setSearchTerm(""); setFilterLevel("All"); setFilterSession("All"); setFilterCompleteness("All"); }}
+              className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+              title="Réinitialiser tous les filtres"
+            >
+              <X size={16} />
+            </button>
           )}
         </div>
       </div>
@@ -438,17 +489,41 @@ export default function CandidatesPage() {
             {selectedIds.size} candidat(s) sélectionné(s)
           </p>
           <div className="flex gap-2">
-            <button 
+            <button
               onClick={() => setSelectedIds(new Set())}
               className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700"
             >
               Annuler
             </button>
-            <button 
+            <button
               onClick={exportToExcel}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-600/20"
             >
               <FileSpreadsheet size={16} /> Exporter la Sélection
+            </button>
+            <button
+              onClick={async () => {
+                if (!confirm(`Envoyer les identifiants LMS à ${selectedIds.size} candidats ?`)) return;
+                const t = toast.loading("Envoi des identifiants...");
+                try {
+                  const res = await fetch("/api/admin/candidates/credentials", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: 'SEND_CREDENTIALS', candidateIds: Array.from(selectedIds), force: true })
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    toast.success(`${data.successCount} e-mails envoyés.`, { id: t });
+                    setSelectedIds(new Set());
+                    loadCandidates();
+                  } else {
+                    toast.error(data.error || "Erreur", { id: t });
+                  }
+                } catch (e) { toast.error("Erreur réseau", { id: t }); }
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-600/20"
+            >
+              <Mail size={16} /> Envoyer Identifiants LMS
             </button>
           </div>
         </div>
@@ -458,8 +533,8 @@ export default function CandidatesPage() {
       <div className="card-premium overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-gray-500 flex flex-col items-center gap-3">
-             <Loader2 className="animate-spin text-[#003366]" size={32} />
-             Chargement des candidats...
+            <Loader2 className="animate-spin text-[#003366]" size={32} />
+            Chargement des candidats...
           </div>
         ) : (
           <>
@@ -467,8 +542,8 @@ export default function CandidatesPage() {
               <thead className="bg-gray-50/50 dark:bg-[#1A1A1A] border-b border-gray-100 dark:border-gray-800">
                 <tr className="text-[11px] uppercase tracking-wider text-gray-400 dark:text-gray-500 font-bold">
                   <th className="px-4 py-4 w-10">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       onChange={toggleSelectAll}
                       checked={processedCandidates.length > 0 && selectedIds.size === processedCandidates.length}
                       className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-[#003366] dark:text-[#D4AF37] focus:ring-[#003366] dark:focus:ring-[#D4AF37] dark:bg-[#1E1E1E] cursor-pointer"
@@ -485,65 +560,147 @@ export default function CandidatesPage() {
                   <th onClick={() => toggleSort('level')} className="px-6 py-4 cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 group">
                     <div className="flex items-center gap-1">Niveau <ArrowDownUp size={12} className={`opacity-0 group-hover:opacity-100 transition-opacity ${sortConfig?.key === 'level' ? 'opacity-100 text-[#003366] dark:text-gray-200' : ''}`} /></div>
                   </th>
+                  <th className="px-6 py-4">Statut</th>
                   <th className="px-6 py-4">Session</th>
+                  <th className="px-6 py-4 text-center">LMS</th>
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-                {processedCandidates.map((candidate) => (
-                  <tr key={candidate.id} className={`hover:bg-gray-50/50 dark:hover:bg-[#1A1A1A] transition-colors group ${selectedIds.has(candidate.id) ? 'bg-blue-50/30 dark:bg-[#1A2234]' : ''}`}>
-                    <td className="px-4 py-4">
-                      <input 
-                        type="checkbox" 
-                        checked={selectedIds.has(candidate.id)}
-                        onChange={() => toggleSelect(candidate.id)}
-                        className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-[#003366] dark:text-[#D4AF37] focus:ring-[#003366] dark:focus:ring-[#D4AF37] dark:bg-[#1E1E1E] cursor-pointer"
-                      />
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-[#003366] dark:text-[#D4AF37] font-bold text-[10px]">
-                          {candidate.firstName ? candidate.firstName[0] : '?'}{candidate.lastName ? candidate.lastName[0] : '?'}
+                {processedCandidates.map((candidate) => {
+                  const incomplete = isIncomplete(candidate);
+                  const missing = getMissingFields(candidate);
+                  return (
+                    <tr key={candidate.id} className={`hover:bg-gray-50/50 dark:hover:bg-[#1A1A1A] transition-colors group ${selectedIds.has(candidate.id) ? 'bg-blue-50/30 dark:bg-[#1A2234]' :
+                      incomplete ? 'bg-orange-50/40 dark:bg-orange-900/10' : ''
+                      }`}>
+                      <td className="px-4 py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(candidate.id)}
+                          onChange={() => toggleSelect(candidate.id)}
+                          className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-[#003366] dark:text-[#D4AF37] focus:ring-[#003366] dark:focus:ring-[#D4AF37] dark:bg-[#1E1E1E] cursor-pointer"
+                        />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-[10px] ${incomplete
+                            ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
+                            : 'bg-blue-50 dark:bg-blue-900/20 text-[#003366] dark:text-[#D4AF37]'
+                            }`}>
+                            {candidate.firstName ? candidate.firstName[0] : '?'}{candidate.lastName ? candidate.lastName[0] : '?'}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-[#003366] dark:text-gray-100 text-sm">{candidate.firstName} {candidate.lastName}</span>
+                            {incomplete && (
+                              <span className="text-[10px] text-orange-500 dark:text-orange-400 font-semibold flex items-center gap-1">
+                                <AlertTriangle size={10} /> Manque : {missing.join(', ')}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <span className="font-bold text-[#003366] dark:text-gray-100 text-sm">{candidate.firstName} {candidate.lastName}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
+                      </td>
+                      <td className="px-6 py-4">
                         {candidate.email ? (
                           <span className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 font-medium bg-blue-50/50 dark:bg-blue-900/20 px-2 py-1 rounded-lg w-fit">
                             <Mail size={12} className="opacity-70 dark:opacity-90" /> {candidate.email}
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-300 dark:text-gray-600 italic">Non renseigné</span>
+                          <span className="flex items-center gap-1 text-xs text-orange-500 dark:text-orange-400 italic font-semibold">
+                            <AlertTriangle size={11} /> Non renseigné
+                          </span>
                         )}
-                    </td>
-                    <td className="px-6 py-4 text-center text-xs font-mono text-gray-800 dark:text-gray-300 font-bold tracking-wider">
-                      {candidate.candidateNumber || '-'}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      {candidate.consultationCode ? (
-                        <span className="font-mono text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-1 rounded">
-                          {candidate.consultationCode.substring(0, 2)}••••
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        {candidate.candidateNumber ? (
+                          <span className="text-xs font-mono text-gray-800 dark:text-gray-300 font-bold tracking-wider">{candidate.candidateNumber}</span>
+                        ) : (
+                          <span className="text-xs text-orange-500 dark:text-orange-400 font-semibold italic">— manquant</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        {candidate.consultationCode ? (
+                          <span className="font-mono text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-1 rounded">
+                            {candidate.consultationCode.substring(0, 2)}••••
+                          </span>
+                        ) : (
+                          <span className="text-gray-300 dark:text-gray-600 italic text-xs">-</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="bg-[#D4AF37] bg-opacity-10 text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#D4AF37]/20 uppercase">
+                          {candidate.level}
                         </span>
-                      ) : (
-                        <span className="text-gray-300 dark:text-gray-600 italic text-xs">-</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="bg-[#D4AF37] bg-opacity-10 text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#D4AF37]/20 uppercase">
-                        {candidate.level}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
+                      </td>
+                      <td className="px-6 py-4">
+                        {candidate.status === "PENDING" ? (
+                          <span className="flex items-center gap-1.5 text-[10px] font-black text-orange-600 bg-orange-100 px-3 py-1 rounded-full uppercase tracking-widest border border-orange-200 animate-pulse">
+                            En attente
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1.5 text-[10px] font-black text-green-600 bg-green-100 px-3 py-1 rounded-full uppercase tracking-widest border border-green-200">
+                            Approuvé
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
                         <span className="text-xs text-gray-700 dark:text-gray-300 font-semibold">{candidate.session?.title || '-'}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button onClick={() => openEditModal(candidate)} className="p-2 text-gray-400 dark:text-gray-500 hover:text-[#003366] dark:hover:text-white transition-colors"><Edit2 size={16} /></button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        {candidate.lmsPassword ? (
+                          <div className="flex justify-center" title="Accès LMS Actif">
+                            <ShieldCheck size={18} className="text-emerald-500" />
+                          </div>
+                        ) : (
+                          <div className="flex justify-center text-gray-200 dark:text-gray-800" title="Pas d'accès LMS">
+                            <ShieldOff size={18} />
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-right space-x-2">
+                        {candidate.status === "PENDING" && (
+                          <button
+                            onClick={async () => {
+                              const toastId = toast.loading("Approbation en cours...");
+                              try {
+                                const res = await fetch(`/api/admin/candidates/${candidate.id}/approve`, { method: "PUT" });
+                                if (res.ok) {
+                                  toast.success("Candidat approuvé !", { id: toastId });
+                                  loadCandidates();
+                                } else {
+                                  toast.error("Erreur lors de l'approbation", { id: toastId });
+                                }
+                              } catch (e) {
+                                toast.error("Erreur réseau", { id: toastId });
+                              }
+                            }}
+                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                            title="Approuver le candidat"
+                          >
+                            <Check size={18} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => window.location.href = `/admin/messages?targetId=${candidate.id}&targetType=STUDENT`}
+                          className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                          title="Envoyer un message"
+                        >
+                          <MessageSquare size={16} />
+                        </button>
+                        <button onClick={() => openEditModal(candidate)} className="p-2 text-gray-400 dark:text-gray-500 hover:text-[#003366] dark:hover:text-white transition-colors" title="Modifier">
+                          <Edit2 size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteCandidate(candidate.id, `${candidate.firstName} ${candidate.lastName}`)} 
+                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" 
+                          title="Supprimer"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
                 {processedCandidates.length === 0 && !loading && (
                   <tr>
                     <td colSpan="8" className="px-6 py-12 text-center text-gray-500 italic">Aucun candidat trouvé.</td>
@@ -551,14 +708,14 @@ export default function CandidatesPage() {
                 )}
               </tbody>
             </table>
-            
-            <Pagination 
-               total={total}
-               page={page}
-               limit={limit}
-               onPageChange={setPage}
-               onLimitChange={(l) => { setLimit(l); setPage(1); }}
-               loading={loading}
+
+            <Pagination
+              total={total}
+              page={page}
+              limit={limit}
+              onPageChange={setPage}
+              onLimitChange={(l) => { setLimit(l); setPage(1); }}
+              loading={loading}
             />
           </>
         )}
@@ -586,7 +743,7 @@ export default function CandidatesPage() {
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
                   Session de destination
                 </label>
-                <select 
+                <select
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-[#003366] outline-none transition-all appearance-none"
                   value={selectedSessionId}
                   onChange={(e) => setSelectedSessionId(e.target.value)}
@@ -615,13 +772,13 @@ export default function CandidatesPage() {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button 
+                <button
                   onClick={() => setIsImportModalOpen(false)}
                   className="flex-1 py-3 px-4 bg-gray-50 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-100 transition-all"
                 >
                   Annuler
                 </button>
-                <button 
+                <button
                   onClick={processImport}
                   disabled={isImporting || dbSessions.length === 0}
                   className="flex-1 py-3 px-4 bg-[#003366] text-white rounded-xl font-bold text-sm hover:bg-[#002244] transition-all shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2"
@@ -646,93 +803,93 @@ export default function CandidatesPage() {
             </div>
 
             <form onSubmit={handleSaveCandidate} className="space-y-6">
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Prénom</label>
-                    <input required type="text" value={candidateForm.firstName} onChange={e => setCandidateForm({...candidateForm, firstName: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Nom</label>
-                    <input required type="text" value={candidateForm.lastName} onChange={e => setCandidateForm({...candidateForm, lastName: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Email</label>
-                    <input type="email" value={candidateForm.email} onChange={e => setCandidateForm({...candidateForm, email: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" placeholder="email@exemple.com" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Numéro Candidat</label>
-                    <input type="text" value={candidateForm.candidateNumber} onChange={e => setCandidateForm({...candidateForm, candidateNumber: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" placeholder="Ex: SMD-123456" />
-                  </div>
-                  <div>
-                     <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Code Consultation</label>
-                     <input type="text" value={candidateForm.consultationCode} onChange={e => setCandidateForm({...candidateForm, consultationCode: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" placeholder="Ex: X8B2P9" />
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Prénom</label>
+                  <input required type="text" value={candidateForm.firstName} onChange={e => setCandidateForm({ ...candidateForm, firstName: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Nom</label>
+                  <input required type="text" value={candidateForm.lastName} onChange={e => setCandidateForm({ ...candidateForm, lastName: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Email</label>
+                  <input type="email" value={candidateForm.email} onChange={e => setCandidateForm({ ...candidateForm, email: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" placeholder="email@exemple.com" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Numéro Candidat</label>
+                  <input type="text" value={candidateForm.candidateNumber} onChange={e => setCandidateForm({ ...candidateForm, candidateNumber: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" placeholder="Ex: SMD-123456" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Code Consultation</label>
+                  <input type="text" value={candidateForm.consultationCode} onChange={e => setCandidateForm({ ...candidateForm, consultationCode: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]" placeholder="Ex: X8B2P9" />
+                </div>
 
-                  <div className="sm:col-span-2 flex justify-end">
-                    <button type="button" onClick={handleAutoGenerate} className="flex items-center gap-2 text-sm text-[#003366] bg-blue-50 px-3 py-2 rounded-lg font-bold hover:bg-blue-100 transition-colors">
-                      <Wand2 size={16}/> Auto-Générer ID et Code vides
-                    </button>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Niveau</label>
-                    <select required value={candidateForm.level} onChange={e => setCandidateForm({...candidateForm, level: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]">
-                      <option value="A1">A1</option>
-                      <option value="A2">A2</option>
-                      <option value="B1">B1</option>
-                      <option value="B2">B2</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Session</label>
-                    <select value={candidateForm.sessionId} onChange={e => setCandidateForm({...candidateForm, sessionId: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]">
-                      <option value="">-- Sans Session --</option>
-                      {dbSessions.map(s => <option key={s.id} value={s.id}>{s.title} ({s.level})</option>)}
-                    </select>
-                  </div>
-                  
-                  {/* Custom Fields render in Modal */}
-                  {customFields.length > 0 && (
-                     <div className="sm:col-span-2 mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="sm:col-span-2">
-                           <h3 className="text-sm font-bold text-[#003366]">Informations Additionnelles (Formulaire dynamique)</h3>
-                        </div>
-                        {customFields.map(f => (
-                           <div key={f.id} className={f.type === 'TEXT' ? 'sm:col-span-2' : ''}>
-                              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">{f.label} {f.required?'*':''}</label>
-                              {f.type === 'TEXT' && <input type="text" value={candidateForm.customData?.[f.id] || ''} onChange={e => setCandidateForm({...candidateForm, customData: {...candidateForm.customData, [f.id]: e.target.value}})} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" />}
-                              {f.type === 'NUMBER' && <input type="number" value={candidateForm.customData?.[f.id] || ''} onChange={e => setCandidateForm({...candidateForm, customData: {...candidateForm.customData, [f.id]: e.target.value}})} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" />}
-                              {f.type === 'DATE' && <input type="date" value={candidateForm.customData?.[f.id] || ''} onChange={e => setCandidateForm({...candidateForm, customData: {...candidateForm.customData, [f.id]: e.target.value}})} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" />}
-                              {f.type === 'SELECT' && (
-                                <select value={candidateForm.customData?.[f.id] || ''} onChange={e => setCandidateForm({...candidateForm, customData: {...candidateForm.customData, [f.id]: e.target.value}})} className="w-full px-4 py-3 bg-gray-50 border rounded-xl">
-                                  <option value="">Sélectionner</option>
-                                  {f.options.map((o,i) => <option key={i} value={o}>{o}</option>)}
-                                </select>
-                              )}
-                              {f.type === 'FILE' && (
-                                <div className="mt-2 text-sm text-[#003366] font-medium p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center justify-between">
-                                   {candidateForm.customData?.[f.id] ? (
-                                      <a href={candidateForm.customData[f.id]} target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-blue-800">
-                                         Voir le Document 📄
-                                      </a>
-                                   ) : (
-                                      <span className="text-gray-400 italic">Aucun fichier transmis</span>
-                                   )}
-                                </div>
-                              )}
-                           </div>
-                        ))}
-                     </div>
-                  )}
-               </div>
-
-               <div className="flex gap-3 pt-6 border-t border-gray-100">
-                  <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-3 px-4 bg-gray-50 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors">Annuler</button>
-                  <button type="submit" disabled={isSaving} className="flex-1 py-3 px-4 bg-[#003366] text-white rounded-xl font-bold text-sm hover:bg-[#002244] transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-900/10">
-                     {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
-                     {isSaving ? "Enregistrement..." : "Enregistrer"}
+                <div className="sm:col-span-2 flex justify-end">
+                  <button type="button" onClick={handleAutoGenerate} className="flex items-center gap-2 text-sm text-[#003366] bg-blue-50 px-3 py-2 rounded-lg font-bold hover:bg-blue-100 transition-colors">
+                    <Wand2 size={16} /> Auto-Générer ID et Code vides
                   </button>
-               </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Niveau</label>
+                  <select required value={candidateForm.level} onChange={e => setCandidateForm({ ...candidateForm, level: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]">
+                    <option value="A1">A1</option>
+                    <option value="A2">A2</option>
+                    <option value="B1">B1</option>
+                    <option value="B2">B2</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Session</label>
+                  <select value={candidateForm.sessionId} onChange={e => setCandidateForm({ ...candidateForm, sessionId: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-[#003366]">
+                    <option value="">-- Sans Session --</option>
+                    {dbSessions.map(s => <option key={s.id} value={s.id}>{s.title} ({s.level})</option>)}
+                  </select>
+                </div>
+
+                {/* Custom Fields render in Modal */}
+                {customFields.length > 0 && (
+                  <div className="sm:col-span-2 mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="sm:col-span-2">
+                      <h3 className="text-sm font-bold text-[#003366]">Informations Additionnelles (Formulaire dynamique)</h3>
+                    </div>
+                    {customFields.map(f => (
+                      <div key={f.id} className={f.type === 'TEXT' ? 'sm:col-span-2' : ''}>
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-2">{f.label} {f.required ? '*' : ''}</label>
+                        {f.type === 'TEXT' && <input type="text" value={candidateForm.customData?.[f.id] || ''} onChange={e => setCandidateForm({ ...candidateForm, customData: { ...candidateForm.customData, [f.id]: e.target.value } })} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" />}
+                        {f.type === 'NUMBER' && <input type="number" value={candidateForm.customData?.[f.id] || ''} onChange={e => setCandidateForm({ ...candidateForm, customData: { ...candidateForm.customData, [f.id]: e.target.value } })} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" />}
+                        {f.type === 'DATE' && <input type="date" value={candidateForm.customData?.[f.id] || ''} onChange={e => setCandidateForm({ ...candidateForm, customData: { ...candidateForm.customData, [f.id]: e.target.value } })} className="w-full px-4 py-3 bg-gray-50 border rounded-xl" />}
+                        {f.type === 'SELECT' && (
+                          <select value={candidateForm.customData?.[f.id] || ''} onChange={e => setCandidateForm({ ...candidateForm, customData: { ...candidateForm.customData, [f.id]: e.target.value } })} className="w-full px-4 py-3 bg-gray-50 border rounded-xl">
+                            <option value="">Sélectionner</option>
+                            {f.options.map((o, i) => <option key={i} value={o}>{o}</option>)}
+                          </select>
+                        )}
+                        {f.type === 'FILE' && (
+                          <div className="mt-2 text-sm text-[#003366] font-medium p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center justify-between">
+                            {candidateForm.customData?.[f.id] ? (
+                              <a href={candidateForm.customData[f.id]} target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-blue-800">
+                                Voir le Document 📄
+                              </a>
+                            ) : (
+                              <span className="text-gray-400 italic">Aucun fichier transmis</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-6 border-t border-gray-100">
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-3 px-4 bg-gray-50 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors">Annuler</button>
+                <button type="submit" disabled={isSaving} className="flex-1 py-3 px-4 bg-[#003366] text-white rounded-xl font-bold text-sm hover:bg-[#002244] transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-900/10">
+                  {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
+                  {isSaving ? "Enregistrement..." : "Enregistrer"}
+                </button>
+              </div>
             </form>
           </div>
         </div>
