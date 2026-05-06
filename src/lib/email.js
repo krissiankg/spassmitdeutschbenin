@@ -429,3 +429,18 @@ export async function sendAdminCredentialsEmail(admin, plainPassword = null) {
     return false;
   }
 }
+
+/**
+ * Test SMTP settings by sending a test email.
+ */
+export async function testSMTPSettings(targetEmail) {
+  const mailOptions = {
+    from: process.env.SMTP_FROM,
+    to: targetEmail,
+    subject: "Test de configuration SMTP - Spass mit Deutsch",
+    text: "Ceci est un email de test pour vérifier la configuration SMTP de votre application Spass mit Deutsch Benin. Si vous recevez ce message, la configuration est correcte.",
+    html: "<p>Ceci est un email de test pour vérifier la configuration SMTP de votre application <b>Spass mit Deutsch Benin</b>. Si vous recevez ce message, la configuration est correcte.</p>"
+  };
+
+  return await transporter.sendMail(mailOptions);
+}

@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { authenticator } from "otplib";
+import * as otplib from "otplib";
+const { authenticator } = otplib;
 import prisma from "./prisma";
 
 export const authOptions = {
