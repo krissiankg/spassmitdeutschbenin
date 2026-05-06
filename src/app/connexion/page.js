@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { GraduationCap, Presentation, ArrowLeft, Home } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -71,7 +72,7 @@ export default function ConnexionChoicePage() {
           className="text-center mb-16"
         >
           <Link href="/">
-            <img src="/logo.png" alt="Logo" className="h-20 mx-auto mb-8 hover:scale-105 transition-transform" />
+            <Image src="/logo.png" alt="Logo" width={80} height={80} className="mx-auto mb-8 hover:scale-105 transition-transform" />
           </Link>
           <h1 className="text-4xl font-extrabold text-[#003366] tracking-tight mb-4">
             {t("connexion.portalTitle")}

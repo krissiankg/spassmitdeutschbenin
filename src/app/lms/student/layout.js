@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -82,7 +83,7 @@ export default function StudentLayout({ children }) {
       >
         <div className="p-6 flex items-center gap-3 overflow-hidden">
           <div className="bg-[#D4AF37] p-2 rounded-xl shrink-0">
-            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain brightness-0 invert" />
+            <Image src="/logo.png" alt="Logo" width={32} height={32} className="object-contain brightness-0 invert" />
           </div>
           {isSidebarOpen && (
             <motion.span
@@ -211,7 +212,7 @@ export default function StudentLayout({ children }) {
                           className="flex items-center gap-4 p-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-2xl transition-all group"
                         >
                           <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-sm">
-                            <img src="/icons/User.png" alt="View" className="w-8 h-8 object-contain" />
+                            <Image src="/icons/User.png" alt="View" width={32} height={32} className="object-contain" />
                           </div>
                           <span className="text-gray-700">{t("nav.profile")}</span>
                         </Link>
@@ -221,7 +222,7 @@ export default function StudentLayout({ children }) {
                           className="flex items-center gap-4 p-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-2xl transition-all group"
                         >
                           <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-sm">
-                            <img src="/icons/Gear.png" alt="Edit" className="w-8 h-8 object-contain" />
+                            <Image src="/icons/Gear.png" alt="Edit" width={32} height={32} className="object-contain" />
                           </div>
                           <span className="text-gray-700">{t("nav.settings")}</span>
                         </Link>
@@ -252,7 +253,6 @@ export default function StudentLayout({ children }) {
         </div>
       </main>
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -272,7 +272,7 @@ export default function StudentLayout({ children }) {
               <div className="flex items-center justify-between mb-12">
                 <div className="flex items-center gap-3">
                   <div className="bg-[#D4AF37] p-2 rounded-xl">
-                    <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain brightness-0 invert" />
+                    <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain brightness-0 invert" />
                   </div>
                   <span className="text-white font-black text-lg">SMD LMS</span>
                 </div>

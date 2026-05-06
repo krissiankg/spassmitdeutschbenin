@@ -8,11 +8,23 @@ export function NotificationBell({ apiUrl }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const dropdownRef = useRef(null);
 
+  const fetchNotifications = React.useCallback(async () => {
+    try {
+      const res = await fetch(apiUrl);
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+      }
+    } catch (e) {
+      console.error("Error fetching notifications", e);
+    }
+  }, [apiUrl]);
+
   useEffect(() => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, [apiUrl]);
+  }, [fetchNotifications]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -24,17 +36,6 @@ export function NotificationBell({ apiUrl }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const fetchNotifications = async () => {
-    try {
-      const res = await fetch(apiUrl);
-      if (res.ok) {
-        const data = await res.json();
-        setNotifications(data);
-      }
-    } catch (e) {
-      console.error("Error fetching notifications", e);
-    }
-  };
 
   const markAllAsRead = async () => {
     try {

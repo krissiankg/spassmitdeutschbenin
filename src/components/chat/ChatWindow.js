@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Video, Settings, Info, Image as ImageIcon, Smile, Send, Paperclip, File, Download, X, Bell, Moon, Trash2, Shield, Mic, MicOff, VideoOff, PhoneOff, Maximize2, ChevronLeft } from 'lucide-react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useTranslations } from "@/hooks/useTranslations";
@@ -285,7 +286,15 @@ const ChatWindow = ({ conversation, messages, onSendMessage, currentUser, onBack
                   {msg.attachmentUrl && (
                     <div className="mb-3 overflow-hidden rounded-xl lg:rounded-2xl border border-black/5 bg-black/5">
                       {msg.attachmentType?.startsWith('image/') ? (
-                        <img src={msg.attachmentUrl} alt={msg.attachmentName} className="w-full h-auto block hover:scale-105 transition-transform cursor-pointer" />
+                        <div className="relative w-full aspect-video">
+                          <Image 
+                            src={msg.attachmentUrl} 
+                            alt={msg.attachmentName || "Image"} 
+                            fill 
+                            className="object-contain hover:scale-105 transition-transform cursor-pointer" 
+                            unoptimized
+                          />
+                        </div>
                       ) : (
                         <div className={`p-3 lg:p-4 flex items-center gap-2 lg:gap-3 ${isMe ? 'bg-white/10' : 'bg-gray-50'}`}>
                           <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl flex items-center justify-center ${isMe ? 'bg-white/20 text-white' : 'bg-white text-[#003366] shadow-sm'}`}>

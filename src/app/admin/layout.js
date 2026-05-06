@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic';
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -224,7 +225,7 @@ export default function AdminLayout({ children }) {
       <div className="german-accent-bar h-1 w-full"></div>
       <div className={cn("p-6 border-b border-gray-50 dark:border-gray-800 flex items-center", isCollapsedMode ? "justify-center" : "gap-3")}>
         <Link href="/" className="flex items-center gap-3 group">
-          <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain group-hover:scale-110 transition-transform" />
+          <Image src="/logo.png" alt="Logo" width={40} height={40} className="object-contain group-hover:scale-110 transition-transform" />
           {!isCollapsedMode && (
             <motion.div
               initial={{ opacity: 0, x: -10 }}

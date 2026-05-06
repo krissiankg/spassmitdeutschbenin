@@ -27,9 +27,9 @@ export const CookieConsent = () => {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-0 left-0 right-0 z-[100] md:bottom-6 md:left-auto md:right-6 md:max-w-md md:left-4"
+          className="fixed bottom-4 left-4 right-4 z-[9999] md:bottom-6 md:right-6 md:left-auto md:max-w-sm"
         >
-          <div className="bg-white dark:bg-[#1A1A1A] rounded-t-2xl md:rounded-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] md:shadow-2xl md:shadow-blue-900/20 border-t md:border border-gray-100 dark:border-gray-800 p-4 md:p-6 relative overflow-hidden">
+          <div className="bg-white dark:bg-[#1A1A1A] rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] dark:shadow-blue-900/10 border border-gray-100 dark:border-gray-800 p-5 md:p-6 relative overflow-hidden pb-[calc(1.25rem+env(safe-area-inset-bottom))] md:pb-6">
             {/* Background pattern - Hidden on mobile for clarity */}
             <div className="hidden md:block absolute -top-12 -right-12 w-24 h-24 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-2xl"></div>
             

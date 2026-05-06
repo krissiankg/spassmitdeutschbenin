@@ -492,11 +492,7 @@ const HistoryTab = () => {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    fetchHistory();
-  }, [page]);
-
-  const fetchHistory = async () => {
+  const fetchHistory = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/accounting/history?page=${page}&limit=20`);
@@ -507,7 +503,11 @@ const HistoryTab = () => {
       }
     } catch (e) { toast.error("Erreur historique"); }
     finally { setLoading(false); }
-  };
+  }, [page]);
+
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
 
   return (
     <div className="bg-white dark:bg-[#1E1E1E] rounded-3xl border border-gray-100 dark:border-gray-800 p-8">
@@ -580,18 +580,18 @@ const RemindersTab = () => {
   const [sending, setSending] = useState(false);
   const [filter, setFilter] = useState("ALL");
 
-  useEffect(() => {
-    fetchDebtors();
-  }, [filter]);
-
-  const fetchDebtors = async () => {
+  const fetchDebtors = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/accounting/reminders?filter=${filter}`);
       if (res.ok) setDebtors(await res.json());
     } catch (e) { toast.error("Erreur relances"); }
     finally { setLoading(false); }
-  };
+  }, [filter]);
+
+  useEffect(() => {
+    fetchDebtors();
+  }, [fetchDebtors]);
 
   const handleSendBulkReminders = async () => {
     if (!confirm(`Envoyer un rappel par email aux ${debtors.length} apprenants sélectionnés ?`)) return;
@@ -673,7 +673,7 @@ const RemindersTab = () => {
             <CheckCircle className="text-emerald-400" size={40} />
           </div>
           <h4 className="text-xl font-black text-emerald-900 dark:text-emerald-400 mb-2 uppercase tracking-tight">Trésorerie à jour</h4>
-          <p className="text-sm font-medium text-emerald-700/60 max-w-xs mx-auto">Aucun impayé n'a été détecté dans la base de données actuelle.</p>
+          <p className="text-sm font-medium text-emerald-700/60 max-w-xs mx-auto">Aucun impayé n&apos;a été détecté dans la base de données actuelle.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -946,7 +946,7 @@ const CategoriesTab = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Libellé complet d'affichage</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Libellé complet d&apos;affichage</label>
                   <input required type="text" placeholder="Ex: Frais de Bibliothèque & CD" value={pricingForm.label} onChange={e => setPricingForm({ ...pricingForm, label: e.target.value })} className="w-full px-5 py-4 bg-gray-50 dark:bg-[#121212] border border-gray-100 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-amber-500/10 outline-none font-bold text-sm" />
                 </div>
 
@@ -1003,7 +1003,7 @@ export default function AccountingPage() {
       <div className="p-10 text-center bg-red-50 dark:bg-red-900/10 rounded-[3rem] text-red-600 mt-8 border border-red-100 dark:border-red-900/20 max-w-2xl mx-auto shadow-2xl shadow-red-900/5">
         <XCircle size={64} className="mx-auto mb-6 opacity-30" />
         <h2 className="text-2xl font-black mb-2 uppercase tracking-tight">Accès Restreint</h2>
-        <p className="font-medium text-red-500/80">Vous devez être identifié comme Comptable ou Administrateur pour accéder à l'interface financière.</p>
+        <p className="font-medium text-red-500/80">Vous devez être identifié comme Comptable ou Administrateur pour accéder à l&apos;interface financière.</p>
         <button onClick={() => window.location.href = '/admin/dashboard'} className="mt-8 px-8 py-3 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-red-600/30">Retour au Tableau de Bord</button>
       </div>
     );

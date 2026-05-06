@@ -24,26 +24,7 @@ const ChatSidebar = ({ conversations, activeId, onSelect, currentUser, onStartNe
     return () => document.head.removeChild(style);
   }, []);
 
-  // Charger les contacts initiaux et les demandes d'amis
-  useEffect(() => {
-    fetchContacts();
-    fetchRequests();
-  }, [currentUser.id]);
-
-  // Recherche avec debouncing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm.length > 2) {
-        fetchContacts(searchTerm);
-      } else if (searchTerm === "") {
-        fetchContacts();
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  const fetchContacts = async (query = "") => {
+  const fetchContacts = React.useCallback(async (query = "") => {
     setIsSearchingContacts(true);
     try {
       const url = query ? `/api/messages/contacts?search=${encodeURIComponent(query)}` : "/api/messages/contacts";
@@ -57,9 +38,9 @@ const ChatSidebar = ({ conversations, activeId, onSelect, currentUser, onStartNe
     } finally {
       setIsSearchingContacts(false);
     }
-  };
+  }, []);
 
-  const fetchRequests = async () => {
+  const fetchRequests = React.useCallback(async () => {
     if (currentUser.userType === "STUDENT") {
       try {
         const res = await fetch('/api/friends/request');
@@ -71,7 +52,27 @@ const ChatSidebar = ({ conversations, activeId, onSelect, currentUser, onStartNe
         console.error("Error fetching requests:", err);
       }
     }
-  };
+  }, [currentUser.userType]);
+
+  // Charger les contacts initiaux et les demandes d'amis
+  useEffect(() => {
+    fetchContacts();
+    fetchRequests();
+  }, [currentUser.id, fetchContacts, fetchRequests]);
+
+  // Recherche avec debouncing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm.length > 2) {
+        fetchContacts(searchTerm);
+      } else if (searchTerm === "") {
+        fetchContacts();
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, fetchContacts]);
+
 
   const handleSendFriendRequest = async (targetId) => {
     try {

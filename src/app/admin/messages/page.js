@@ -16,6 +16,41 @@ export default function AdminMessagingPage() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchConversations = React.useCallback(async () => {
+    try {
+      const res = await fetch('/api/messages/conversations');
+      if (res.ok) {
+        const data = await res.json();
+        setConversations(data);
+      }
+    } catch (error) {
+      console.error("Fetch conversations error:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleStartNewChat = React.useCallback(async (targetId, targetType) => {
+    try {
+      const res = await fetch('/api/messages/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetId, targetType })
+      });
+
+      if (res.ok) {
+        const newConv = await res.json();
+        await fetchConversations();
+        setActiveConversation(newConv);
+      } else {
+        toast.error("Impossible d'ouvrir la discussion");
+      }
+    } catch (err) {
+      console.error("Start new chat error:", err);
+      toast.error("Erreur lors de l'ouverture");
+    }
+  }, [fetchConversations]);
+
   useEffect(() => {
     if (session) {
       fetchConversations();
@@ -30,36 +65,9 @@ export default function AdminMessagingPage() {
         window.history.replaceState({}, '', window.location.pathname);
       }
     }
-  }, [session]);
+  }, [session, fetchConversations, handleStartNewChat]);
 
-  useEffect(() => {
-    if (activeConversation) {
-      fetchMessages(activeConversation.id);
-
-      // Polling pour les nouveaux messages
-      const interval = setInterval(() => {
-        fetchMessages(activeConversation.id, true);
-      }, 5000);
-
-      return () => clearInterval(interval);
-    }
-  }, [activeConversation]);
-
-  const fetchConversations = async () => {
-    try {
-      const res = await fetch('/api/messages/conversations');
-      if (res.ok) {
-        const data = await res.json();
-        setConversations(data);
-      }
-    } catch (error) {
-      console.error("Fetch conversations error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchMessages = async (convId, isPolling = false) => {
+  const fetchMessages = React.useCallback(async (convId, isPolling = false) => {
     try {
       const res = await fetch(`/api/messages/${convId}`);
       if (res.ok) {
@@ -74,8 +82,20 @@ export default function AdminMessagingPage() {
     } catch (error) {
       console.error("Fetch messages error:", error);
     }
-  };
+  }, [messages.length, fetchConversations]);
 
+  useEffect(() => {
+    if (activeConversation) {
+      fetchMessages(activeConversation.id);
+
+      // Polling pour les nouveaux messages
+      const interval = setInterval(() => {
+        fetchMessages(activeConversation.id, true);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [activeConversation, fetchMessages]);
   const handleSendMessage = async (content, attachment = null) => {
     if (!activeConversation) return;
 
@@ -100,27 +120,6 @@ export default function AdminMessagingPage() {
     } catch (error) {
       console.error("Send message error:", error);
       toast.error("Erreur serveur");
-    }
-  };
-
-  const handleStartNewChat = async (targetId, targetType) => {
-    try {
-      const res = await fetch('/api/messages/conversations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetId, targetType })
-      });
-
-      if (res.ok) {
-        const newConv = await res.json();
-        await fetchConversations();
-        setActiveConversation(newConv);
-      } else {
-        toast.error("Impossible d'ouvrir la discussion");
-      }
-    } catch (err) {
-      console.error("Start new chat error:", err);
-      toast.error("Erreur lors de l'ouverture");
     }
   };
 
