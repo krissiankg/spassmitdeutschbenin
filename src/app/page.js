@@ -23,30 +23,30 @@ const Navbar = () => {
     <div className="german-accent-bar h-1 w-full absolute top-0 left-0"></div>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1">
       <div className="flex justify-between h-20 items-center">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-shrink-0 mr-4">
           <img src="/logo.png" alt="Spass mit Deutsch" className="w-10 h-10 object-contain" />
-          <span className="font-bold text-xl tracking-tight text-[#003366] dark:text-gray-100 whitespace-nowrap">
+          <span className="font-bold text-lg md:text-xl tracking-tight text-[#003366] dark:text-gray-100 whitespace-nowrap">
             Spass mit Deutsch <span className="text-[#D4AF37]">Benin</span>
           </span>
         </div>
-        <div className="hidden md:flex items-center space-x-4">
-          <Link href="https://www.spassmitdeutschbenin.com/" target="_blank" className="text-[#003366] font-bold dark:text-[#D4AF37] hover:underline transition-colors text-sm whitespace-nowrap">{t("common.officialSite")}</Link>
-          <div className="h-4 w-px bg-gray-200 dark:bg-gray-800"></div>
-          <Link href="#how-it-works" className="text-gray-600 dark:text-gray-300 hover:text-[#003366] dark:hover:text-white transition-colors whitespace-nowrap">{t("public.howItWorks.title")}</Link>
-          <Link href="#faq" className="text-gray-600 dark:text-gray-300 hover:text-[#003366] dark:hover:text-white transition-colors whitespace-nowrap">{t("public.faq.title")}</Link>
+        <div className="hidden md:flex items-center space-x-3 lg:space-x-4 ml-auto">
+          <Link href="https://www.spassmitdeutschbenin.com/" target="_blank" className="text-[#003366] font-bold dark:text-[#D4AF37] hover:underline transition-colors text-xs lg:text-sm whitespace-nowrap">{t("common.officialSite")}</Link>
+          <div className="hidden lg:block h-4 w-px bg-gray-200 dark:bg-gray-800"></div>
+          <Link href="#how-it-works" className="hidden lg:block text-gray-600 dark:text-gray-300 hover:text-[#003366] dark:hover:text-white transition-colors whitespace-nowrap text-sm">{t("public.howItWorks.title")}</Link>
+          <Link href="#faq" className="hidden xl:block text-gray-600 dark:text-gray-300 hover:text-[#003366] dark:hover:text-white transition-colors whitespace-nowrap text-sm">{t("public.faq.title")}</Link>
           <ThemeToggle />
           <LanguageSwitcher variant="compact" />
           
           {status === "authenticated" ? (
-            <Link href={getDashboardUrl()} className="flex items-center gap-2 bg-[#003366] dark:bg-[#D4AF37] text-white dark:text-[#003366] font-bold px-4 py-2 rounded-xl shadow-lg hover:opacity-90 transition-all text-sm whitespace-nowrap">
+            <Link href={getDashboardUrl()} className="flex items-center gap-2 bg-[#003366] dark:bg-[#D4AF37] text-white dark:text-[#003366] font-bold px-3 lg:px-4 py-2 rounded-xl shadow-lg hover:opacity-90 transition-all text-xs lg:text-sm whitespace-nowrap">
               <LayoutDashboard size={16} />
               {t("nav.dashboard")}
             </Link>
           ) : (
-            <Link href="/connexion" className="text-[#003366] dark:text-[#D4AF37] font-bold hover:opacity-80 transition-all text-sm border-2 border-[#003366] dark:border-[#D4AF37] px-4 py-2 rounded-xl whitespace-nowrap">{t("common.login")}</Link>
+            <Link href="/connexion" className="text-[#003366] dark:text-[#D4AF37] font-bold hover:opacity-80 transition-all text-xs lg:text-sm border-2 border-[#003366] dark:border-[#D4AF37] px-3 lg:px-4 py-2 rounded-xl whitespace-nowrap">{t("common.login")}</Link>
           )}
           
-          <Link href="/consultation" className="btn-primary py-2 px-5 text-sm whitespace-nowrap">{t("consultation.title")}</Link>
+          <Link href="/consultation" className="btn-primary py-2 px-4 lg:px-5 text-xs lg:text-sm whitespace-nowrap">{t("consultation.title")}</Link>
         </div>
       </div>
     </div>
