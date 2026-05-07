@@ -8,7 +8,7 @@ import { getAuthSession } from "@/lib/auth";
 
 export async function GET(request) {
   const sessionAuth = await getAuthSession();
-  if (!sessionAuth || (sessionAuth.user.role !== "SUPER_ADMIN" && sessionAuth.user.role !== "ACCOUNTANT" && sessionAuth.user.role !== "SECRETARY")) {
+  if (!sessionAuth || (sessionAuth.user.role !== "SUPER_ADMIN" && sessionAuth.user.role !== "ACCOUNTANT" && sessionAuth.user.role !== "COMPTABLE" && sessionAuth.user.role !== "SECRETARY")) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 

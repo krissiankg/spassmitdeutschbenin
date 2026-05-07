@@ -182,7 +182,7 @@ export default function AdminLayout({ children }) {
       href: "/admin/accounting", 
       icon: Wallet, 
       label: t("admin.nav.accounting"), 
-      roles: ["SUPER_ADMIN", "ACCOUNTANT", "SECRETARY"] 
+      roles: ["SUPER_ADMIN", "ACCOUNTANT", "COMPTABLE", "SECRETARY"] 
     },
     {
       type: 'group',
@@ -201,7 +201,7 @@ export default function AdminLayout({ children }) {
       icon: Settings,
       items: [
         { href: "/admin/form-builder", icon: FileText, label: t("admin.nav.formBuilder"), roles: ["SUPER_ADMIN"] },
-        { href: "/admin/settings", icon: Settings, label: t("admin.nav.settings"), roles: ["SUPER_ADMIN"] },
+        { href: "/admin/settings", icon: Settings, label: t("admin.nav.settings"), roles: ["SUPER_ADMIN", "SECRETARY", "ACCOUNTANT", "COMPTABLE"] },
       ]
     }
   ];
@@ -290,7 +290,7 @@ export default function AdminLayout({ children }) {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-gray-900 dark:text-gray-200 truncate">{session.user.name || t("admin.nav.userDefault")}</p>
               <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate uppercase tracking-tighter">
-                {session.user.role === "SUPER_ADMIN" ? t("admin.nav.roles.superAdmin") : session.user.role === "ACCOUNTANT" ? t("admin.nav.roles.accountant") : t("admin.nav.roles.secretary")}
+                {session.user.role === "SUPER_ADMIN" ? t("admin.nav.roles.superAdmin") : (session.user.role === "ACCOUNTANT" || session.user.role === "COMPTABLE") ? t("admin.nav.roles.accountant") : t("admin.nav.roles.secretary")}
               </p>
             </div>
           )}

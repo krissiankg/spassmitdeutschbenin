@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const userRole = session?.user?.role || "SECRETARY";
   
   const isSuperAdmin = userRole === "SUPER_ADMIN";
-  const isAccountant = userRole === "ACCOUNTANT" || isSuperAdmin;
+  const isAccountant = userRole === "ACCOUNTANT" || userRole === "COMPTABLE" || isSuperAdmin;
   const isSecretary = userRole === "SECRETARY" || isSuperAdmin;
 
   const [activeTab, setActiveTab] = useState("profile");
@@ -56,9 +56,9 @@ export default function SettingsPage() {
 
   // Tab Definitions
   const TABS = [
-    { id: "profile", label: "Mon Profil", icon: User, roles: ["SUPER_ADMIN", "SECRETARY", "ACCOUNTANT"], group: "Personnel" },
+    { id: "profile", label: "Mon Profil", icon: User, roles: ["SUPER_ADMIN", "SECRETARY", "ACCOUNTANT", "COMPTABLE"], group: "Personnel" },
     { id: "users", label: "Gestion des Rôles", icon: Users, roles: ["SUPER_ADMIN"], group: "Administration" },
-    { id: "pricing", label: "Tarifs & Finances", icon: CreditCard, roles: ["SUPER_ADMIN", "ACCOUNTANT"], group: "Administration" },
+    { id: "pricing", label: "Tarifs & Finances", icon: CreditCard, roles: ["SUPER_ADMIN", "ACCOUNTANT", "COMPTABLE"], group: "Administration" },
     { id: "communications", label: "Outils d'Envoi Mail", icon: Send, roles: ["SUPER_ADMIN", "SECRETARY"], group: "Système" },
     { id: "lms", label: "Accès LMS Étudiants", icon: Lock, roles: ["SUPER_ADMIN", "SECRETARY"], group: "Système" },
     { id: "audit", label: "Journal d'Audit", icon: History, roles: ["SUPER_ADMIN"], group: "Sécurité" },

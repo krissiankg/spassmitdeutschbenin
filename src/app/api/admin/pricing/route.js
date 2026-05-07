@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const session = await getAuthSession();
-    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT")) {
+    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT" && session.user.role !== "COMPTABLE")) {
        return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST(req) {
   try {
     const session = await getAuthSession();
-    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT")) {
+    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT" && session.user.role !== "COMPTABLE")) {
        return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
@@ -43,7 +43,7 @@ export async function POST(req) {
 export async function PUT(req) {
   try {
     const session = await getAuthSession();
-    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT")) {
+    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT" && session.user.role !== "COMPTABLE")) {
        return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
@@ -65,7 +65,7 @@ export async function PUT(req) {
 export async function DELETE(req) {
   try {
     const session = await getAuthSession();
-    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT")) {
+    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT" && session.user.role !== "COMPTABLE")) {
        return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 

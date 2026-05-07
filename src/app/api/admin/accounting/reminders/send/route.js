@@ -6,7 +6,7 @@ import nodemailer from "nodemailer";
 export async function POST(req) {
   try {
     const session = await getAuthSession();
-    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT")) {
+    if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "ACCOUNTANT" && session.user.role !== "COMPTABLE")) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 

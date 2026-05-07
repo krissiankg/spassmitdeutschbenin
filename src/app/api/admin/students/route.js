@@ -16,7 +16,7 @@ export async function GET(request) {
 
     try {
         const session = await getAuthSession();
-        if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "SECRETARY" && session.user.role !== "ACCOUNTANT")) {
+        if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "SECRETARY" && session.user.role !== "ACCOUNTANT" && session.user.role !== "COMPTABLE")) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
