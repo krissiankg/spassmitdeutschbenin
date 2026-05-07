@@ -43,8 +43,8 @@ const NavItem = ({ href, icon: Icon, label, isActive, isSubItem = false, isColla
     )}
   >
     <div className="flex items-center gap-3">
-      <Icon size={isSubItem ? 18 : 20} className={cn(isActive ? "text-[#D4AF37]" : "group-hover:text-[#003366]")} />
-      {!isCollapsed && <span className={cn("font-medium whitespace-nowrap", isSubItem ? "text-sm" : "text-base")}>{label}</span>}
+      <Icon size={isSubItem ? 18 : 20} className={cn("shrink-0", isActive ? "text-[#D4AF37]" : "group-hover:text-[#003366]")} />
+      {!isCollapsed && <span className={cn("font-medium leading-tight", isSubItem ? "text-sm" : "text-base")}>{label}</span>}
     </div>
     {isActive && !isSubItem && !isCollapsed && <ChevronRight size={16} className="text-white/50" />}
     
@@ -67,8 +67,8 @@ const NavGroup = ({ label, icon: Icon, children, isActive, isOpen, onToggle, isC
         )}
       >
         <div className="flex items-center gap-3">
-          <Icon size={20} className={cn(isActive ? "text-[#003366]" : "group-hover:text-[#003366]")} />
-          {!isCollapsed && <span className="font-bold whitespace-nowrap">{label}</span>}
+          <Icon size={20} className={cn("shrink-0", isActive ? "text-[#003366]" : "group-hover:text-[#003366]")} />
+          {!isCollapsed && <span className="font-bold leading-tight">{label}</span>}
         </div>
         {!isCollapsed && (
           <motion.div
@@ -89,7 +89,7 @@ const NavGroup = ({ label, icon: Icon, children, isActive, isOpen, onToggle, isC
             transition={{ duration: 0.2 }}
             className="overflow-hidden pl-4 space-y-1"
           >
-            <div className="border-l-2 border-gray-100 dark:border-gray-800 ml-6 pl-2 space-y-1">
+            <div className="border-l-2 border-gray-100 dark:border-gray-800 ml-4 pl-2 space-y-1">
               {children}
             </div>
           </motion.div>
@@ -231,7 +231,7 @@ export default function AdminLayout({ children }) {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <span className="font-bold text-lg block text-[#003366] dark:text-gray-100 whitespace-nowrap">Spass mit Deutsch</span>
+              <span className="font-bold text-lg block text-[#003366] dark:text-gray-100">Spass mit Deutsch</span>
               <span className="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold">Administration</span>
             </motion.div>
           )}
@@ -322,7 +322,7 @@ export default function AdminLayout({ children }) {
       <aside 
         className={cn(
           "hidden md:flex bg-white dark:bg-[#1E1E1E] border-r border-gray-100 dark:border-gray-800 flex-col sticky top-0 h-screen z-40 transition-all duration-300",
-          isCollapsed ? "w-20" : "w-72"
+          isCollapsed ? "w-20" : "w-80"
         )}
       >
         <SidebarContent isCollapsedMode={isCollapsed} />
@@ -344,7 +344,7 @@ export default function AdminLayout({ children }) {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 bottom-0 w-72 bg-white dark:bg-[#1E1E1E] z-[60] flex flex-col md:hidden"
+              className="fixed left-0 top-0 bottom-0 w-80 bg-white dark:bg-[#1E1E1E] z-[60] flex flex-col md:hidden"
             >
               <SidebarContent isCollapsedMode={false} />
             </motion.aside>
