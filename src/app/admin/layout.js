@@ -224,7 +224,7 @@ export default function AdminLayout({ children }) {
     <>
       <div className="german-accent-bar h-1 w-full"></div>
       <div className={cn("p-6 border-b border-gray-50 dark:border-gray-800 flex items-center", isCollapsedMode ? "justify-center" : "gap-3")}>
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 group">
           <Image src="/logo.png" alt="Logo" width={40} height={40} className="object-contain group-hover:scale-110 transition-transform" />
           {!isCollapsedMode && (
             <motion.div
@@ -386,8 +386,9 @@ export default function AdminLayout({ children }) {
             </div>
 
             <div className="hidden md:block h-8 w-px bg-gray-100 dark:bg-gray-700"></div>
-            <Link
               href="/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 px-3 md:px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[#003366] dark:hover:text-white hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-all"
             >
               <Home size={16} />

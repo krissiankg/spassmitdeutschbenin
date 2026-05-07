@@ -81,8 +81,8 @@ export default function StudentLayout({ children }) {
         className={`${isSidebarOpen ? "w-72" : "w-20"
           } hidden md:flex flex-col bg-[#003366] text-white transition-all duration-300 ease-in-out fixed h-full z-40 shadow-2xl`}
       >
-        <div className="p-6 flex items-center gap-3 overflow-hidden">
-          <div className="bg-[#D4AF37] p-2 rounded-xl shrink-0">
+        <Link href="/" target="_blank" rel="noopener noreferrer" className="p-6 flex items-center gap-3 overflow-hidden group">
+          <div className="bg-[#D4AF37] p-2 rounded-xl shrink-0 group-hover:scale-110 transition-transform">
             <Image src="/logo.png" alt="Logo" width={32} height={32} className="object-contain brightness-0 invert" />
           </div>
           {isSidebarOpen && (
@@ -94,7 +94,7 @@ export default function StudentLayout({ children }) {
               SMD <span className="text-[#D4AF37]">LMS</span>
             </motion.span>
           )}
-        </div>
+        </Link>
 
         <nav className="flex-1 mt-8 px-4 space-y-2">
           {menuItems.map((item) => {

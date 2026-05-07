@@ -1,14 +1,23 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { Search, ShieldCheck, Smartphone, CheckCircle, ArrowRight, HelpCircle, BookOpen, GraduationCap } from "lucide-react";
+import { Search, ShieldCheck, Smartphone, CheckCircle, ArrowRight, HelpCircle, BookOpen, GraduationCap, LayoutDashboard } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslations } from "@/hooks/useTranslations";
 
 const Navbar = () => {
   const { t } = useTranslations();
+  const { data: session, status } = useSession();
+
+  const getDashboardUrl = () => {
+    if (!session?.user?.role) return "/connexion";
+    if (session.user.role === "STUDENT") return "/lms/student/dashboard";
+    return "/admin/dashboard";
+  };
+
   return (
   <nav className="sticky top-0 z-50 glass border-b border-gray-100 dark:border-gray-800">
     <div className="german-accent-bar h-1 w-full absolute top-0 left-0"></div>
@@ -27,7 +36,16 @@ const Navbar = () => {
           <Link href="#faq" className="text-gray-600 dark:text-gray-300 hover:text-[#003366] dark:hover:text-white transition-colors whitespace-nowrap">{t("public.faq.title")}</Link>
           <ThemeToggle />
           <LanguageSwitcher variant="compact" />
-          <Link href="/connexion" className="text-[#003366] dark:text-[#D4AF37] font-bold hover:opacity-80 transition-all text-sm border-2 border-[#003366] dark:border-[#D4AF37] px-4 py-2 rounded-xl whitespace-nowrap">{t("common.login")}</Link>
+          
+          {status === "authenticated" ? (
+            <Link href={getDashboardUrl()} className="flex items-center gap-2 bg-[#003366] dark:bg-[#D4AF37] text-white dark:text-[#003366] font-bold px-4 py-2 rounded-xl shadow-lg hover:opacity-90 transition-all text-sm whitespace-nowrap">
+              <LayoutDashboard size={16} />
+              {t("nav.dashboard")}
+            </Link>
+          ) : (
+            <Link href="/connexion" className="text-[#003366] dark:text-[#D4AF37] font-bold hover:opacity-80 transition-all text-sm border-2 border-[#003366] dark:border-[#D4AF37] px-4 py-2 rounded-xl whitespace-nowrap">{t("common.login")}</Link>
+          )}
+          
           <Link href="/consultation" className="btn-primary py-2 px-5 text-sm whitespace-nowrap">{t("consultation.title")}</Link>
         </div>
       </div>
