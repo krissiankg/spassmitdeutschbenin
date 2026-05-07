@@ -386,6 +386,7 @@ export default function AdminLayout({ children }) {
             </div>
 
             <div className="hidden md:block h-8 w-px bg-gray-100 dark:bg-gray-700"></div>
+            <Link
               href="/"
               target="_blank"
               rel="noopener noreferrer"
