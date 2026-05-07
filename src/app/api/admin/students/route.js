@@ -22,7 +22,12 @@ export async function GET(request) {
 
         let where = {
             AND: [
-                { formType: 'SIMPLE' }
+                {
+                    OR: [
+                        { formType: 'SIMPLE' },
+                        { lmsPassword: { not: null } }
+                    ]
+                }
             ]
         };
 
