@@ -430,6 +430,47 @@ export async function sendAdminCredentialsEmail(admin, plainPassword = null) {
   }
 }
 
+
+/**
+ * Email de communication générale (No-Reply)
+ */
+export async function sendGeneralEmail(email, name, title, body) {
+  if (!email) return false;
+
+  const mailOptions = {
+    from: process.env.SMTP_FROM,
+    to: email,
+    subject: title,
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #003366; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+        <div style="background-color: #003366; padding: 20px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">Spass mit Deutsch Benin</h1>
+        </div>
+        <div style="padding: 30px;">
+          <h2 style="color: #003366; font-size: 18px; margin-top: 0;">Bonjour ${name || 'Étudiant'},</h2>
+          <div style="font-size: 15px; line-height: 1.6; color: #334155;">
+            ${body.replace(/\n/g, '<br>')}
+          </div>
+        </div>
+        <div style="background-color: #f1f5f9; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+          <p style="margin: 0; font-size: 11px; color: #64748b;">
+            Ceci est un message automatique, merci de ne pas y répondre.<br>
+            © ${new Date().getFullYear()} Spass mit Deutsch Benin.
+          </p>
+        </div>
+      </div>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Erreur d'envoi general email:", error);
+    return false;
+  }
+}
+
 /**
  * Test SMTP settings by sending a test email.
  */

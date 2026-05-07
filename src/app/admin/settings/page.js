@@ -49,6 +49,9 @@ export default function SettingsPage() {
   
   const [smtpStatus, setSmtpStatus] = useState("unknown"); // unknown, connected, error
   
+  // General Messaging State
+  const [generalMessage, setGeneralMessage] = useState({ title: "", body: "", group: "ALL_STUDENTS" });
+  
   const [loading, setLoading] = useState(false);
 
   // Tab Definitions
@@ -304,6 +307,34 @@ export default function SettingsPage() {
       
       if (res.ok) {
         toast.success(`${data.successCount} emails envoyés (${data.failCount} échecs sur ${data.total} candidats).`, { id: t });
+      } else {
+        toast.error(data.error || "Erreur d'envoi", { id: t });
+      }
+    } catch (error) { toast.error("Erreur réseau", { id: t }); }
+    finally { setLoading(false); }
+  };
+
+  const handleSendGeneralMessage = async (e) => {
+    e.preventDefault();
+    if (!generalMessage.title || !generalMessage.body) return toast.error("Le titre et le message sont obligatoires");
+    
+    const t = toast.loading("Envoi du message en cours...");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/communications/send-general-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          title: generalMessage.title, 
+          body: generalMessage.body, 
+          recipientGroup: generalMessage.group 
+        })
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success(`${data.successCount} messages envoyés avec succès.`, { id: t });
+        setGeneralMessage({ ...generalMessage, title: "", body: "" });
       } else {
         toast.error(data.error || "Erreur d'envoi", { id: t });
       }
@@ -636,6 +667,64 @@ export default function SettingsPage() {
                       L&apos;envoi va distribuer le code secret à TOUS les candidats ayant une adresse email valide dans cette session.
                     </p>
                   </div>
+                </div>
+
+                {/* New General Messaging Section */}
+                <div className="mt-8 bg-blue-50/50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-800/50 p-6">
+                  <div className="flex items-center gap-2 text-[#003366] dark:text-blue-400 font-bold text-sm mb-4">
+                    <Mail size={16} /> Messagerie Générale (Email No-Reply)
+                  </div>
+                  
+                  <form onSubmit={handleSendGeneralMessage} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="md:col-span-1">
+                        <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Objet du Message</label>
+                        <input 
+                          type="text"
+                          required
+                          placeholder="Ex: Information importante - Spass mit Deutsch"
+                          className="w-full px-4 py-3 bg-white dark:bg-[#1A1A1A] border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-[#003366] outline-none dark:text-white transition-all font-bold text-sm"
+                          value={generalMessage.title}
+                          onChange={e => setGeneralMessage({ ...generalMessage, title: e.target.value })}
+                        />
+                      </div>
+                      <div className="md:col-span-1">
+                        <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Destinataires</label>
+                        <select 
+                          className="w-full px-4 py-3 bg-white dark:bg-[#1A1A1A] border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-[#003366] outline-none dark:text-white transition-all font-bold text-sm"
+                          value={generalMessage.group}
+                          onChange={e => setGeneralMessage({ ...generalMessage, group: e.target.value })}
+                        >
+                          <option value="ALL_STUDENTS">Tous les Étudiants (Cours réguliers)</option>
+                          <option value="OSD_CANDIDATES">Tous les Candidats (Examens ÖSD)</option>
+                          <option value="ADMIN_TEAM">L&apos;équipe Administrative uniquement</option>
+                          <option value="EVERYONE">Tout le monde (Étudiants + Candidats + Admin)</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Corps du Message</label>
+                        <textarea 
+                          rows={4}
+                          required
+                          placeholder="Écrivez votre message ici..."
+                          className="w-full px-4 py-3 bg-white dark:bg-[#1A1A1A] border border-gray-100 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-[#003366] outline-none dark:text-white transition-all text-sm min-h-[120px]"
+                          value={generalMessage.body}
+                          onChange={e => setGeneralMessage({ ...generalMessage, body: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <button 
+                        type="submit"
+                        disabled={loading}
+                        className="px-8 py-3 bg-[#003366] text-white rounded-xl font-bold flex items-center gap-2 hover:bg-[#002244] transition-all shadow-lg shadow-blue-900/10"
+                      >
+                        {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                        Envoyer le Message Email
+                      </button>
+                    </div>
+                  </form>
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-gray-100 dark:border-gray-800">
