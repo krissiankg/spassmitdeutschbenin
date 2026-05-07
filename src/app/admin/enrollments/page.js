@@ -11,7 +11,8 @@ import {
   Filter,
   Loader2,
   Mail,
-  Phone
+  Phone,
+  Trash2
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -76,6 +77,26 @@ export default function AdminEnrollmentsPage() {
         loadEnrollments();
       } else {
         toast.error("Erreur lors de la mise à jour");
+      }
+    } catch (error) {
+      toast.error("Erreur réseau");
+    }
+  };
+
+  const handleDeleteEnrollment = async (id) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer définitivement cette inscription ? Cela ajustera également le solde de l'étudiant.")) return;
+
+    try {
+      const res = await fetch(`/api/admin/enrollments?id=${id}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        toast.success("Inscription supprimée avec succès");
+        loadEnrollments();
+      } else {
+        const error = await res.json();
+        toast.error(error.error || "Erreur lors de la suppression");
       }
     } catch (error) {
       toast.error("Erreur réseau");
@@ -163,28 +184,39 @@ export default function AdminEnrollmentsPage() {
               <div className="flex items-center justify-between lg:justify-end gap-6 w-full lg:w-auto">
                 <StatusBadge status={en.status} />
 
-                {en.status === 'PENDING' ? (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleUpdateStatus(en.id, 'APPROVED')}
-                      className="p-3 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition-all shadow-lg shadow-green-500/20"
-                      title="Valider l'inscription"
-                    >
-                      <CheckCircle size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleUpdateStatus(en.id, 'REJECTED')}
-                      className="p-3 bg-red-500 text-white rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
-                      title="Refuser l'inscription"
-                    >
-                      <XCircle size={20} />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="text-gray-300 italic text-xs font-medium">
-                    Traité le {new Date(en.updatedAt).toLocaleDateString()}
-                  </div>
-                )}
+                <div className="flex gap-2">
+                  {en.status === 'PENDING' && (
+                    <>
+                      <button
+                        onClick={() => handleUpdateStatus(en.id, 'APPROVED')}
+                        className="p-3 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition-all shadow-lg shadow-green-500/20"
+                        title="Valider l'inscription"
+                      >
+                        <CheckCircle size={20} />
+                      </button>
+                      <button
+                        onClick={() => handleUpdateStatus(en.id, 'REJECTED')}
+                        className="p-3 bg-red-500 text-white rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
+                        title="Refuser l'inscription"
+                      >
+                        <XCircle size={20} />
+                      </button>
+                    </>
+                  )}
+                  
+                  {en.status !== 'PENDING' && (
+                    <div className="text-gray-300 italic text-[10px] font-medium self-center mr-2">
+                      Traité le {new Date(en.updatedAt).toLocaleDateString()}
+                    </div>
+                  )}
+                  <button
+                    onClick={() => handleDeleteEnrollment(en.id)}
+                    className="p-3 bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-2xl transition-all"
+                    title="Supprimer l'inscription"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
