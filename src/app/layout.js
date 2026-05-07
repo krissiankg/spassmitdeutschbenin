@@ -5,8 +5,13 @@ export const metadata = {
   title: "Spass mit Deutsch Benin | Plateforme de Résultats",
   description: "Plateforme officielle de consultation des résultats d'examen pour le centre de formation Spass mit Deutsch au Bénin.",
   icons: {
-    icon: "/favicon.ico",
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: [
+      { url: "/logo.png" },
+    ],
   },
 };
 
