@@ -6,11 +6,11 @@ export const metadata = {
   description: "Plateforme officielle de consultation des résultats d'examen pour le centre de formation Spass mit Deutsch au Bénin.",
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico?v=2" },
+      { url: "/icon.png?v=2", type: "image/png" },
     ],
     apple: [
-      { url: "/logo.png" },
+      { url: "/logo.png?v=2" },
     ],
   },
 };
