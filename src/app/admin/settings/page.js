@@ -1018,6 +1018,8 @@ export default function SettingsPage() {
              </form>
           </div>
         </div>
+      )}
+
       {/* Audit Details Modal */}
       {isDetailsModalOpen && selectedLogDetails && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
