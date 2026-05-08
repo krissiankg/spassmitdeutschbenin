@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { sendAdminCredentialsEmail } from "@/lib/email";
+import { recordAuditLog } from "@/lib/audit";
 
 export async function POST(req) {
   try {
@@ -24,11 +25,23 @@ export async function POST(req) {
       return NextResponse.json({ error: "Admin not found" }, { status: 404 });
     }
 
-    // On ne peut pas envoyer le mot de passe actuel car il est hashé.
-    // L'email contiendra une note expliquant cela, ou le super admin peut changer le mot de passe avant.
     const success = await sendAdminCredentialsEmail(admin);
 
     if (success) {
+      // Logger l'action dans l'audit
+      await recordAuditLog({
+        session,
+        action: "SEND_CREDENTIALS",
+        targetType: "ADMIN",
+        targetId: admin.id,
+        targetName: `${admin.name} (${admin.email})`,
+        details: { 
+          method: "EMAIL",
+          status: "SENT",
+          recipientEmail: admin.email
+        }
+      });
+
       return NextResponse.json({ success: true, message: "Emails envoyés avec succès" });
     } else {
       return NextResponse.json({ error: "Erreur lors de l'envoi de l'email" }, { status: 500 });

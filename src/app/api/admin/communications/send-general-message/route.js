@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { sendGeneralEmail } from "@/lib/email";
+import { recordAuditLog } from "@/lib/audit";
 
 export async function POST(request) {
   try {
@@ -66,6 +67,20 @@ export async function POST(request) {
     });
 
     await Promise.all(emailPromises);
+
+    // Logger l'action dans l'audit
+    await recordAuditLog({
+      session: sessionAuth,
+      action: "SEND_GENERAL_EMAIL",
+      targetType: "SYSTEM",
+      targetName: `Message: ${title}`,
+      details: { 
+        group: recipientGroup,
+        successCount, 
+        failCount, 
+        total: recipients.length 
+      }
+    });
 
     return NextResponse.json({
       message: "Emails envoyés",

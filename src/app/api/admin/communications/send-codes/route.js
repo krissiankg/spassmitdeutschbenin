@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { sendConsultationCodeEmail } from "@/lib/email";
+import { recordAuditLog } from "@/lib/audit";
 
 export async function POST(request) {
   try {
@@ -14,6 +15,15 @@ export async function POST(request) {
 
     if (!sessionId) {
       return NextResponse.json({ error: "ID de session requis" }, { status: 400 });
+    }
+
+    const sessionData = await prisma.session.findUnique({
+      where: { id: sessionId },
+      select: { title: true }
+    });
+
+    if (!sessionData) {
+      return NextResponse.json({ error: "Session non trouvée" }, { status: 404 });
     }
 
     const candidates = await prisma.candidate.findMany({
@@ -38,6 +48,20 @@ export async function POST(request) {
     });
 
     await Promise.all(emailPromises);
+
+    // Logger l'action dans l'audit
+    await recordAuditLog({
+      session: sessionAuth,
+      action: "SEND_SESSION_CODES",
+      targetType: "SESSION",
+      targetId: sessionId,
+      targetName: sessionData.title,
+      details: { 
+        successCount, 
+        failCount, 
+        total: candidates.length 
+      }
+    });
 
     return NextResponse.json({
       message: "Emails envoyés",
