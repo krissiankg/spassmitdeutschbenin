@@ -40,6 +40,9 @@ export async function PUT(request) {
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("Profile Update Error:", error);
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+    if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      return NextResponse.json({ error: "Cet email est déjà utilisé par un autre administrateur" }, { status: 400 });
+    }
+    return NextResponse.json({ error: error.message || "Erreur serveur" }, { status: 500 });
   }
 }

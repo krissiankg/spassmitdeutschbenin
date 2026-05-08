@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { Search, ShieldCheck, Smartphone, CheckCircle, ArrowRight, HelpCircle, BookOpen, GraduationCap, LayoutDashboard } from "lucide-react";
+import { Search, ShieldCheck, Smartphone, CheckCircle, ArrowRight, HelpCircle, BookOpen, GraduationCap, LayoutDashboard, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -11,6 +11,7 @@ import { useTranslations } from "@/hooks/useTranslations";
 const Navbar = () => {
   const { t } = useTranslations();
   const { data: session, status } = useSession();
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const getDashboardUrl = () => {
     if (!session?.user?.role) return "/connexion";
@@ -23,12 +24,23 @@ const Navbar = () => {
     <div className="german-accent-bar h-1 w-full absolute top-0 left-0"></div>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1">
       <div className="flex justify-between h-20 items-center">
-        <div className="flex items-center gap-3 flex-shrink-0 mr-4">
-          <img src="/logo.png" alt="Spass mit Deutsch" className="w-10 h-10 object-contain" />
-          <span className="font-bold text-lg md:text-xl tracking-tight text-[#003366] dark:text-gray-100 whitespace-nowrap">
+        <div className="flex items-center gap-2 flex-shrink mr-2 min-w-0">
+          <img src="/logo.png" alt="Spass mit Deutsch" className="w-8 h-8 md:w-10 md:h-10 object-contain flex-shrink-0" />
+          <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-[#003366] dark:text-gray-100 truncate">
             Spass mit Deutsch <span className="text-[#D4AF37]">Benin</span>
           </span>
         </div>
+        <div className="flex md:hidden items-center gap-1">
+          <ThemeToggle />
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-1.5 text-[#003366] dark:text-[#D4AF37] hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
         <div className="hidden md:flex items-center space-x-3 lg:space-x-4 ml-auto">
           <Link href="https://www.spassmitdeutschbenin.com/" target="_blank" className="text-[#003366] font-bold dark:text-[#D4AF37] hover:underline transition-colors text-xs lg:text-sm whitespace-nowrap">{t("common.officialSite")}</Link>
           <div className="hidden lg:block h-4 w-px bg-gray-200 dark:bg-gray-800"></div>
@@ -50,6 +62,56 @@ const Navbar = () => {
         </div>
       </div>
     </div>
+
+    {/* Mobile Menu */}
+    <motion.div 
+      initial={false}
+      animate={{ height: mobileMenuOpen ? "auto" : 0, opacity: mobileMenuOpen ? 1 : 0 }}
+      className="md:hidden overflow-hidden bg-white dark:bg-[#0A0A0A] border-t border-gray-100 dark:border-gray-800"
+    >
+      <div className="px-4 py-6 space-y-4 flex flex-col">
+        <Link 
+          href="https://www.spassmitdeutschbenin.com/" 
+          target="_blank"
+          onClick={() => setMobileMenuOpen(false)}
+          className="text-[#003366] dark:text-[#D4AF37] font-bold py-2 border-b border-gray-50 dark:border-gray-900"
+        >
+          {t("common.officialSite")}
+        </Link>
+        
+        <Link 
+          href="/consultation"
+          onClick={() => setMobileMenuOpen(false)}
+          className="text-gray-600 dark:text-gray-300 py-2 border-b border-gray-50 dark:border-gray-900"
+        >
+          {t("consultation.title")}
+        </Link>
+
+        <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-900">
+          <span className="text-gray-600 dark:text-gray-300">Langue</span>
+          <LanguageSwitcher variant="compact" />
+        </div>
+
+        {status === "authenticated" ? (
+          <Link 
+            href={getDashboardUrl()}
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-center gap-2 bg-[#003366] dark:bg-[#D4AF37] text-white dark:text-[#003366] font-bold py-4 rounded-xl shadow-lg"
+          >
+            <LayoutDashboard size={20} />
+            {t("nav.dashboard")}
+          </Link>
+        ) : (
+          <Link 
+            href="/connexion"
+            onClick={() => setMobileMenuOpen(false)}
+            className="text-center text-[#003366] dark:text-[#D4AF37] font-bold border-2 border-[#003366] dark:border-[#D4AF37] py-4 rounded-xl"
+          >
+            {t("common.login")}
+          </Link>
+        )}
+      </div>
+    </motion.div>
   </nav>
   );
 };

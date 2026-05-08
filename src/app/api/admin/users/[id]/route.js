@@ -36,6 +36,10 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json(updatedUser);
   } catch (error) {
+    console.error("Admin Update Error:", error);
+    if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      return NextResponse.json({ error: "Cet email est déjà utilisé" }, { status: 400 });
+    }
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
