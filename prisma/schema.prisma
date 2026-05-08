@@ -248,10 +248,10 @@ model Participant {
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   
   candidateId    String?
-  candidate      Candidate?   @relation(fields: [candidateId], references: [id])
+  candidate      Candidate?   @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   
   adminId        String?
-  admin          Admin?       @relation(fields: [adminId], references: [id])
+  admin          Admin?       @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
   @@unique([conversationId, candidateId])
   @@unique([conversationId, adminId])
@@ -266,10 +266,10 @@ model Message {
   createdAt      DateTime     @default(now())
   
   senderCandidateId String?
-  senderCandidate   Candidate? @relation("SentMessagesCandidate", fields: [senderCandidateId], references: [id])
+  senderCandidate   Candidate? @relation("SentMessagesCandidate", fields: [senderCandidateId], references: [id], onDelete: SetNull)
   
   senderAdminId     String?
-  senderAdmin       Admin?     @relation("SentMessagesAdmin", fields: [senderAdminId], references: [id])
+  senderAdmin       Admin?     @relation("SentMessagesAdmin", fields: [senderAdminId], references: [id], onDelete: SetNull)
 
   isRead         Boolean      @default(false)
   
