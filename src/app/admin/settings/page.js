@@ -52,6 +52,10 @@ export default function SettingsPage() {
   // General Messaging State
   const [generalMessage, setGeneralMessage] = useState({ title: "", body: "", group: "ALL_STUDENTS" });
   
+  // Audit Details Modal State
+  const [selectedLogDetails, setSelectedLogDetails] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  
   const [loading, setLoading] = useState(false);
 
   // Tab Definitions
@@ -882,6 +886,7 @@ export default function SettingsPage() {
                         <th className="px-6 py-4">Admin</th>
                         <th className="px-6 py-4">Action</th>
                         <th className="px-6 py-4">Cible</th>
+                        <th className="px-6 py-4 text-right">Infos</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
@@ -895,6 +900,19 @@ export default function SettingsPage() {
                             <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[9px] font-bold uppercase">{log.action.replace(/_/g, ' ')}</span>
                           </td>
                           <td className="px-6 py-4 text-gray-700 dark:text-gray-300 font-bold">{log.targetName || '-'}</td>
+                          <td className="px-6 py-4 text-right">
+                            {log.details && Object.keys(log.details).length > 0 && (
+                              <button 
+                                onClick={() => {
+                                  setSelectedLogDetails(log);
+                                  setIsDetailsModalOpen(true);
+                                }}
+                                className="p-1.5 text-gray-400 hover:text-[#003366] dark:hover:text-white transition-colors bg-gray-50 dark:bg-gray-800 rounded-lg"
+                              >
+                                <Eye size={14} />
+                              </button>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -998,6 +1016,48 @@ export default function SettingsPage() {
                   <button type="submit" disabled={loading} className="px-6 py-2 text-sm font-bold text-white bg-[#003366] rounded-xl">Valider</button>
                 </div>
              </form>
+          </div>
+        </div>
+      {/* Audit Details Modal */}
+      {isDetailsModalOpen && selectedLogDetails && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/80 backdrop-blur-sm" onClick={() => setIsDetailsModalOpen(false)}></div>
+          <div className="relative bg-white dark:bg-[#121212] rounded-3xl shadow-2xl p-8 w-full max-w-lg animate-in fade-in zoom-in duration-200 border border-gray-100 dark:border-gray-800">
+             <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-xl font-bold text-[#003366] dark:text-gray-100">Détails de l&apos;Action</h3>
+                  <p className="text-xs text-gray-500 mt-1">{new Date(selectedLogDetails.createdAt).toLocaleString('fr-FR')}</p>
+                </div>
+                <button onClick={() => setIsDetailsModalOpen(false)} className="p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">
+                   <Plus size={20} className="rotate-45 text-gray-400" />
+                </button>
+             </div>
+
+             <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 dark:bg-[#1A1A1A] rounded-2xl border border-gray-100 dark:border-gray-800/50">
+                    <span className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Administrateur</span>
+                    <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{selectedLogDetails.adminName}</span>
+                  </div>
+                  <div className="p-3 bg-gray-50 dark:bg-[#1A1A1A] rounded-2xl border border-gray-100 dark:border-gray-800/50">
+                    <span className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Action</span>
+                    <span className="text-sm font-bold text-blue-600 uppercase">{selectedLogDetails.action.replace(/_/g, ' ')}</span>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-gray-50 dark:bg-[#1A1A1A] rounded-2xl border border-gray-100 dark:border-gray-800/50">
+                  <span className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Données Techniques (JSON)</span>
+                  <pre className="text-[11px] font-mono text-gray-600 dark:text-gray-400 bg-white dark:bg-black/20 p-4 rounded-xl border border-gray-100 dark:border-gray-800 overflow-x-auto max-h-[300px]">
+                    {JSON.stringify(selectedLogDetails.details, null, 2)}
+                  </pre>
+                </div>
+             </div>
+
+             <div className="mt-8 flex justify-end">
+                <button onClick={() => setIsDetailsModalOpen(false)} className="px-6 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-xl font-bold text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+                  Fermer
+                </button>
+             </div>
           </div>
         </div>
       )}

@@ -19,7 +19,7 @@ export async function sendConsultationCodeEmail(candidate, sessionTitle) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "https://www.spassmitdeutschbenin.com";
 
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
     to: candidate.email,
     subject: `Vos résultats d'examen - Session ${sessionTitle}`,
     html: `
@@ -95,7 +95,7 @@ export async function sendRegistrationEmail(candidate, lmsPasswordClear = null) 
   ` : '';
 
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
     to: candidate.email,
     subject: `Confirmation d'inscription - Spass mit Deutsch Benin`,
     html: `
@@ -151,7 +151,7 @@ export async function sendPaymentReceiptEmail(candidate, payment, sessionTitle) 
   const pdfBuffer = await generatePaymentReceiptBuffer(candidate, payment, sessionTitle);
 
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
     to: candidate.email,
     subject: `Reçu de paiement - Dossier ${candidate.candidateNumber}`,
     html: `
@@ -196,7 +196,7 @@ export async function sendPaymentReceiptEmail(candidate, payment, sessionTitle) 
  */
 export async function sendResetPasswordEmail(email, name, resetUrl) {
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
     to: email,
     subject: "Réinitialisation de votre mot de passe - Spass mit Deutsch",
     html: `
@@ -285,7 +285,7 @@ export async function sendAdminNotificationEmail(candidateData, selectedLevels, 
   const color = isOsd ? "#ef4444" : "#3b82f6";
 
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
     to: adminEmails.join(", "),
     subject: `🔔 Nouvelle Inscription ${typeLabel} : ${firstName} ${lastName}`,
     html: `
@@ -383,7 +383,7 @@ export async function sendAdminCredentialsEmail(admin, plainPassword = null) {
   `;
 
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
     to: admin.email,
     subject: `Vos identifiants d'accès - Spass mit Deutsch Benin`,
     html: `
@@ -438,7 +438,7 @@ export async function sendGeneralEmail(email, name, title, body) {
   if (!email) return false;
 
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
     to: email,
     subject: title,
     html: `
@@ -476,7 +476,7 @@ export async function sendGeneralEmail(email, name, title, body) {
  */
 export async function testSMTPSettings(targetEmail) {
   const mailOptions = {
-    from: process.env.SMTP_FROM,
+    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
     to: targetEmail,
     subject: "Test de configuration SMTP - Spass mit Deutsch",
     text: "Ceci est un email de test pour vérifier la configuration SMTP de votre application Spass mit Deutsch Benin. Si vous recevez ce message, la configuration est correcte.",
