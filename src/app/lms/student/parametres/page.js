@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { 
   Settings, 
   Key, 
@@ -464,7 +465,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-3xl inline-block border-2 border-white shadow-inner">
-                   <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" />
+                   <Image src={qrCodeUrl} alt="QR Code" width={192} height={192} unoptimized />
                 </div>
 
                 <div className="space-y-4">

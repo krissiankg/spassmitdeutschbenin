@@ -16,26 +16,7 @@ export default function MessagingPage() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (session) {
-      fetchConversations();
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (activeConversation) {
-      fetchMessages(activeConversation.id);
-
-      // Polling pour les nouveaux messages et mise à jour de la sidebar
-      const interval = setInterval(() => {
-        fetchMessages(activeConversation.id, true);
-      }, 5000);
-
-      return () => clearInterval(interval);
-    }
-  }, [activeConversation]);
-
-  const fetchConversations = async () => {
+  const fetchConversations = React.useCallback(async () => {
     try {
       const res = await fetch('/api/messages/conversations');
       if (res.ok) {
@@ -47,9 +28,9 @@ export default function MessagingPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchMessages = async (convId, isPolling = false) => {
+  const fetchMessages = React.useCallback(async (convId, isPolling = false) => {
     try {
       const res = await fetch(`/api/messages/${convId}`);
       if (res.ok) {
@@ -66,7 +47,26 @@ export default function MessagingPage() {
     } catch (error) {
       console.error("Fetch messages error:", error);
     }
-  };
+  }, [messages.length, fetchConversations]);
+
+  useEffect(() => {
+    if (session) {
+      fetchConversations();
+    }
+  }, [session, fetchConversations]);
+
+  useEffect(() => {
+    if (activeConversation) {
+      fetchMessages(activeConversation.id);
+
+      // Polling pour les nouveaux messages et mise à jour de la sidebar
+      const interval = setInterval(() => {
+        fetchMessages(activeConversation.id, true);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [activeConversation, fetchMessages]);
 
   const handleSendMessage = async (content, attachment = null) => {
     if (!activeConversation) return;

@@ -56,7 +56,7 @@ export default function MesCours() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchData();

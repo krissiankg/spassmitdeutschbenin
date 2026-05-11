@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Upload, CheckCircle, Loader2, User, Calendar, ShieldCheck, CreditCard, PlusCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -114,7 +115,7 @@ export default function RegisterSimplePage() {
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center">
           <Link href="/register" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#003366] mb-4"><ArrowLeft size={16}/> Retour au choix</Link><br/>
-          <Link href="/"><img src="/logo.png" alt="SMD" className="h-20 mx-auto object-contain mb-4 hover:scale-105 transition-transform"/></Link>
+          <Link href="/"><Image src="/logo.png" alt="SMD" width={80} height={80} className="h-20 mx-auto object-contain mb-4 hover:scale-105 transition-transform"/></Link>
           <span className="inline-flex items-center gap-2 bg-blue-50 text-[#003366] px-4 py-2 rounded-full text-sm font-bold mb-4">📚 Inscription Cours Réguliers</span>
           <h1 className="text-4xl font-extrabold text-[#003366] mb-2">Formulaire de Préinscription</h1>
           <p className="text-gray-500 text-lg">Rejoignez nos cours d&apos;allemand toute l&apos;année.</p>

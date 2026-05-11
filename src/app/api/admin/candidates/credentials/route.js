@@ -80,24 +80,29 @@ export async function POST(request) {
         // Envoi de l'email si action SEND_CREDENTIALS
         if (action === 'SEND_CREDENTIALS') {
           if (!candidate.email) {
+            console.warn(`[Credentials] Candidat ${candidate.id} n'a pas d'email.`);
             failCount++;
             continue;
           }
 
           // Note : on ne peut envoyer que si on a le password en clair (on vient de le générer)
-          // Si on force l'envoi sans régénérer, on ne peut pas car le hash est irréversible.
-          // Donc on envoie seulement si lmsPasswordClear est défini.
           if (lmsPasswordClear) {
             const sent = await sendRegistrationEmail({ ...candidate }, lmsPasswordClear);
-            if (sent) successCount++;
-            else failCount++;
+            if (sent) {
+              successCount++;
+            } else {
+              console.error(`[Credentials] Échec de l'envoi d'email à ${candidate.email}`);
+              failCount++;
+            }
           } else {
-            // Cas où le password existait déjà et on n'a pas forcé la régénération
-            // Pour l'instant, on considère que l'envoi nécessite une régénération pour être sûr du clair.
+            // Cas où le password existait déjà et on n'a pas forcé la régénération (force=false)
+            // On ne peut pas envoyer car le hash bcrypt est irréversible.
+            console.log(`[Credentials] Envoi ignoré pour ${candidate.email} car le mot de passe existe déjà et 'force' est faux.`);
             failCount++;
           }
         } else if (action === 'INITIALIZE') {
           if (needsNewPassword) successCount++;
+          else console.log(`[Credentials] Initialisation ignorée pour ${candidate.email} (déjà configuré).`);
         }
       } catch (err) {
         console.error(`Error processing candidate ${candidate.id}:`, err);
@@ -115,10 +120,13 @@ export async function POST(request) {
     });
 
     return NextResponse.json({
-      message: "Opération terminée",
+      message: failCount > 0 
+        ? "Opération terminée avec certains échecs. Note : Pour renvoyer des identifiants à un étudiant qui en a déjà, cochez 'Régénérer les mots de passe'."
+        : "Opération terminée avec succès",
       successCount,
       failCount,
-      total: candidates.length
+      total: candidates.length,
+      warning: failCount > 0 ? "Le mot de passe ne peut pas être envoyé s'il existe déjà sans l'option 'Régénérer'." : null
     });
 
   } catch (error) {

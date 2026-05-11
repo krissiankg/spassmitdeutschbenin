@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Lock, Mail, Loader2, AlertCircle, ArrowRight, Home } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -56,7 +57,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl shadow-xl shadow-blue-900/5 mb-6 group hover:scale-105 transition-transform duration-300">
-            <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+            <Image src="/logo.png" alt="Logo" width={48} height={48} className="object-contain" />
           </div>
           <h1 className="text-4xl font-bold text-[#003366] tracking-tight mb-2">{t("auth.welcome")}</h1>
           <p className="text-gray-500 font-medium">{t("auth.adminSpace")}</p>

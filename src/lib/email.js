@@ -1,17 +1,36 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT, 10),
-  secure: process.env.SMTP_PORT === '465' || process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false
+/**
+ * Crée et configure une instance fraîche du transporteur Nodemailer.
+ * En environnement Serverless (Vercel), il est préférable de ne pas partager 
+ * d'instance globale pour éviter les problèmes de socket/timeout.
+ */
+function getTransporter() {
+  const host = process.env.SMTP_HOST;
+  const port = parseInt(process.env.SMTP_PORT, 10);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!host || !user || !pass) {
+    console.warn("⚠️ SMTP Configuration manquante. Vérifiez vos variables d'environnement.");
   }
-});
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465 || process.env.SMTP_SECURE === 'true',
+    auth: { user, pass },
+    tls: {
+      rejectUnauthorized: false // Permet de contourner les erreurs de certificat sur certains serveurs mutualisés
+    },
+    // Optimisations pour le Serverless
+    connectionTimeout: 10000, // 10 secondes pour établir la connexion
+    greetingTimeout: 10000,   // 10 secondes pour attendre le message de bienvenue
+    socketTimeout: 10000,     // 10 secondes d'inactivité du socket
+    debug: process.env.NODE_ENV !== 'production',
+    logger: process.env.NODE_ENV !== 'production',
+  });
+}
 
 // Helper pour formater l'expéditeur de manière robuste
 const getFromAddress = () => {
@@ -71,6 +90,7 @@ export async function sendConsultationCodeEmail(candidate, sessionTitle) {
   };
 
   try {
+    const transporter = getTransporter();
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
@@ -147,6 +167,7 @@ export async function sendRegistrationEmail(candidate, lmsPasswordClear = null) 
   };
 
   try {
+    const transporter = getTransporter();
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
@@ -197,6 +218,7 @@ export async function sendPaymentReceiptEmail(candidate, payment, sessionTitle) 
   };
 
   try {
+    const transporter = getTransporter();
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
@@ -263,6 +285,7 @@ export async function sendResetPasswordEmail(email, name, resetUrl) {
   };
 
   try {
+    const transporter = getTransporter();
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
@@ -365,6 +388,7 @@ export async function sendAdminNotificationEmail(candidateData, selectedLevels, 
   };
 
   try {
+    const transporter = getTransporter();
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
@@ -436,6 +460,7 @@ export async function sendAdminCredentialsEmail(admin, plainPassword = null) {
   };
 
   try {
+    const transporter = getTransporter();
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
@@ -477,6 +502,7 @@ export async function sendGeneralEmail(email, name, title, body) {
   };
 
   try {
+    const transporter = getTransporter();
     await transporter.sendMail(mailOptions);
     return true;
   } catch (error) {
@@ -497,5 +523,6 @@ export async function testSMTPSettings(targetEmail) {
     html: "<p>Ceci est un email de test pour vérifier la configuration SMTP de votre application <b>Spass mit Deutsch Benin</b>. Si vous recevez ce message, la configuration est correcte.</p>"
   };
 
+  const transporter = getTransporter();
   return await transporter.sendMail(mailOptions);
 }

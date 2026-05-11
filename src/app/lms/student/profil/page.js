@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { 
   User, 
   Mail, 
@@ -132,7 +133,7 @@ export default function ProfilePage() {
               className="bg-[#003366] text-white font-black py-4 px-10 rounded-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-4 shadow-xl shadow-blue-900/20 group"
             >
               <div className="p-3 bg-white/10 rounded-xl group-hover:bg-[#D4AF37] transition-colors">
-                 <img src="/icons/Gear.png" alt="Edit" className="w-6 h-6 brightness-0 invert" />
+                 <Image src="/icons/Gear.png" alt="Edit" width={24} height={24} className="brightness-0 invert" />
               </div>
               {t("profile.modifyInfo")}
             </button>
@@ -142,7 +143,7 @@ export default function ProfilePage() {
 
       <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-xl shadow-blue-900/5 overflow-hidden relative">
         <div className="absolute top-0 right-0 p-8 opacity-5">
-           <img src="/logo.png" alt="Logo" className="w-48 h-48 object-contain" />
+           <Image src="/logo.png" alt="Logo" width={192} height={192} className="object-contain" />
         </div>
 
         <div className="relative z-10 flex flex-col lg:flex-row gap-12">

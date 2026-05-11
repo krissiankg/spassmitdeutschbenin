@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Search, ShieldCheck, Smartphone, CheckCircle, ArrowRight, HelpCircle, BookOpen, GraduationCap, LayoutDashboard, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
@@ -25,7 +26,7 @@ const Navbar = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1">
       <div className="flex justify-between h-20 items-center">
         <div className="flex items-center gap-2 flex-shrink mr-2 min-w-0">
-          <img src="/logo.png" alt="Spass mit Deutsch" className="w-8 h-8 md:w-10 md:h-10 object-contain flex-shrink-0" />
+          <Image src="/logo.png" alt="Spass mit Deutsch" width={40} height={40} className="w-8 h-8 md:w-10 md:h-10 object-contain flex-shrink-0" />
           <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-[#003366] dark:text-gray-100 truncate">
             Spass mit Deutsch <span className="text-[#D4AF37]">Benin</span>
           </span>
@@ -311,7 +312,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-12 mb-12 border-b border-white/10 pb-12">
             <div className="col-span-2">
               <div className="flex items-center gap-3 mb-6">
-                <img src="/logo.png" alt="Spass mit Deutsch" className="w-12 h-12 object-contain" />
+                <Image src="/logo.png" alt="Spass mit Deutsch" width={48} height={48} className="object-contain" />
                 <span className="font-bold text-2xl tracking-tight">Spass mit Deutsch Benin</span>
               </div>
               <p className="text-white/60 max-w-sm mb-6">

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { 
   FileText, 
   Download, 
@@ -94,7 +95,7 @@ export default function ResultDetailPage() {
       <nav className="glass border-b border-gray-100 py-4 bg-white/80 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3 text-[#003366] font-bold">
-            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+            <Image src="/logo.png" alt="Logo" width={32} height={32} className="object-contain" />
             <span>Spass mit Deutsch</span>
           </Link>
           <Link href="/consultation" className="text-gray-500 hover:text-[#003366] flex items-center gap-2 text-sm transition-colors">

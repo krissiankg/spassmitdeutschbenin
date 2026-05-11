@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
@@ -93,7 +94,7 @@ export default function RegisterChoicePage() {
           className="text-center mb-12"
         >
           <Link href="/">
-            <img src="/logo.png" alt="Spass mit Deutsch Benin" className="h-20 mx-auto object-contain mb-6 hover:scale-105 transition-transform" />
+            <Image src="/logo.png" alt="Spass mit Deutsch Benin" width={80} height={80} className="h-20 mx-auto object-contain mb-6 hover:scale-105 transition-transform" />
           </Link>
           <h1 className="text-4xl font-extrabold text-[#003366] tracking-tight mb-3">
             {t("register.portalTitle")}
