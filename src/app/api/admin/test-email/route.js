@@ -18,7 +18,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("Test SMTP Error:", error);
     return NextResponse.json({ 
-      error: "Échec du test SMTP. Vérifiez vos variables d'environnement dans le fichier .env (HOST, PORT, USER, PASS).",
+      error: `Échec du test SMTP : ${error.message}. Vérifiez vos réglages (Host, Port, User, Pass).`,
       details: error.message 
     }, { status: 500 });
   }

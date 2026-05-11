@@ -13,13 +13,27 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Helper pour formater l'expéditeur de manière robuste
+const getFromAddress = () => {
+  const smtpFrom = process.env.SMTP_FROM || process.env.SMTP_USER;
+  if (!smtpFrom) return '"Spass mit Deutsch Benin" <noreply@spassmitdeutschbenin.com>';
+  
+  // Si SMTP_FROM contient déjà des chevrons, on l'utilise tel quel
+  if (smtpFrom.includes('<') && smtpFrom.includes('>')) {
+    return smtpFrom;
+  }
+  
+  // Sinon on ajoute le nom par défaut
+  return `"Spass mit Deutsch Benin" <${smtpFrom}>`;
+};
+
 export async function sendConsultationCodeEmail(candidate, sessionTitle) {
   if (!candidate.email) return false;
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "https://www.spassmitdeutschbenin.com";
 
   const mailOptions = {
-    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
+    from: getFromAddress(),
     to: candidate.email,
     subject: `Vos résultats d'examen - Session ${sessionTitle}`,
     html: `
@@ -95,7 +109,7 @@ export async function sendRegistrationEmail(candidate, lmsPasswordClear = null) 
   ` : '';
 
   const mailOptions = {
-    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
+    from: getFromAddress(),
     to: candidate.email,
     subject: `Confirmation d'inscription - Spass mit Deutsch Benin`,
     html: `
@@ -151,7 +165,7 @@ export async function sendPaymentReceiptEmail(candidate, payment, sessionTitle) 
   const pdfBuffer = await generatePaymentReceiptBuffer(candidate, payment, sessionTitle);
 
   const mailOptions = {
-    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
+    from: getFromAddress(),
     to: candidate.email,
     subject: `Reçu de paiement - Dossier ${candidate.candidateNumber}`,
     html: `
@@ -196,7 +210,7 @@ export async function sendPaymentReceiptEmail(candidate, payment, sessionTitle) 
  */
 export async function sendResetPasswordEmail(email, name, resetUrl) {
   const mailOptions = {
-    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
+    from: getFromAddress(),
     to: email,
     subject: "Réinitialisation de votre mot de passe - Spass mit Deutsch",
     html: `
@@ -285,7 +299,7 @@ export async function sendAdminNotificationEmail(candidateData, selectedLevels, 
   const color = isOsd ? "#ef4444" : "#3b82f6";
 
   const mailOptions = {
-    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
+    from: getFromAddress(),
     to: adminEmails.join(", "),
     subject: `🔔 Nouvelle Inscription ${typeLabel} : ${firstName} ${lastName}`,
     html: `
@@ -383,7 +397,7 @@ export async function sendAdminCredentialsEmail(admin, plainPassword = null) {
   `;
 
   const mailOptions = {
-    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
+    from: getFromAddress(),
     to: admin.email,
     subject: `Vos identifiants d'accès - Spass mit Deutsch Benin`,
     html: `
@@ -438,7 +452,7 @@ export async function sendGeneralEmail(email, name, title, body) {
   if (!email) return false;
 
   const mailOptions = {
-    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
+    from: getFromAddress(),
     to: email,
     subject: title,
     html: `
@@ -476,7 +490,7 @@ export async function sendGeneralEmail(email, name, title, body) {
  */
 export async function testSMTPSettings(targetEmail) {
   const mailOptions = {
-    from: `"Spass mit Deutsch Benin" <${process.env.SMTP_FROM}>`,
+    from: getFromAddress(),
     to: targetEmail,
     subject: "Test de configuration SMTP - Spass mit Deutsch",
     text: "Ceci est un email de test pour vérifier la configuration SMTP de votre application Spass mit Deutsch Benin. Si vous recevez ce message, la configuration est correcte.",
