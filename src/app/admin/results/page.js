@@ -110,11 +110,16 @@ export default function ResultsGridPage() {
                   const ruleMax = OSD_RULES[c.level]?.[name]?.max || moduleDef.maxScore;
                   const ruleMin = OSD_RULES[c.level]?.[name]?.min || 0;
                   
+                  const hasSpecificModules = c.chosenModules && c.chosenModules.length > 0;
+                  const isRegisteredForThis = hasSpecificModules 
+                      ? c.chosenModules.includes(moduleDef.code) 
+                      : true;
+
                   registeredModuleConfigs[name] = {
                       id: moduleDef.id,
                       max: ruleMax,
                       min: ruleMin,
-                      isRegistered: !!moduleScore // On ne permet la saisie que si inscrit
+                      isRegistered: isRegisteredForThis
                   };
                   scores[moduleDef.id] = moduleScore ? String(moduleScore.score) : "";
               }
