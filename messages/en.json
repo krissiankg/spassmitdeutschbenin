@@ -361,6 +361,7 @@
       "messaging": "Messaging",
       "formBuilder": "Form Builder",
       "settings": "Settings",
+      "pricing": "Exam Pricing",
       "help": "Help Center",
       "menuTitle": "Main Menu",
       "userDefault": "User",
@@ -457,7 +458,8 @@
         "secretary": "Secretariat",
         "accounting": "Accounting",
         "communication": "Communication",
-        "security": "Security"
+        "security": "Security",
+        "tutorials": "Tutorials"
       },
       "sections": {
         "presentation": {
@@ -511,6 +513,22 @@
           "rbacDesc": "Rights are restricted by role: Super Admin (all), Accountant (finance), Secretary (grades/candidates).",
           "twoFactor": "Two-Factor Authentication (2FA)",
           "twoFactorDesc": "Enable 2FA in your settings to secure access to your administrative account."
+        },
+        "tutorials": {
+          "title": "Interactive Guides & Tutorials",
+          "noteEntry": {
+            "title": "Tutorial 1: How to record a grade?",
+            "desc": "Follow this guide to enter ÖSD exam results without errors.",
+            "step1": "Access Management",
+            "step1Desc": "On the login page, scroll to the very bottom and click 'Access the management interface'.",
+            "step2": "Authentication",
+            "step2Desc": "Enter your personal credentials. You will be redirected to the dashboard.",
+            "step3": "ÖSD Exam Menu",
+            "step3Desc": "In the left menu, select 'ÖSD Exam' then the 'Grade Entry' option.",
+            "step4": "Final Record",
+            "step4Desc": "Enter the grades by module for each candidate and click the blue 'Save All' button at the top right.",
+            "footer": "This tutorial is finished. For any questions, contact technical support."
+          }
         },
         "footer": {
           "title": "Still have questions?",

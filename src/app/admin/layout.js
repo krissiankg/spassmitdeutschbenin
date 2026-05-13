@@ -20,7 +20,8 @@ import {
   FileText,
   HelpCircle,
   MessageSquare,
-  GraduationCap
+  GraduationCap,
+  Tags
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -130,9 +131,8 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     const findAndOpenGroup = () => {
       const structure = [
-        { id: 'exam', items: ["/admin/sessions", "/admin/candidates", "/admin/results"] },
+        { id: 'exam', items: ["/admin/sessions", "/admin/candidates", "/admin/results", "/admin/pricing"] },
         { id: 'students', items: ["/admin/courses", "/admin/enrollments", "/admin/students"] },
-        { id: 'comm', items: ["/admin/messages", "/admin/help"] },
         { id: 'config', items: ["/admin/form-builder", "/admin/settings"] },
       ];
       const activeGroup = structure.find(g => g.items.includes(pathname));
@@ -162,6 +162,7 @@ export default function AdminLayout({ children }) {
       icon: GraduationCap,
       items: [
         { href: "/admin/sessions", icon: Calendar, label: t("admin.nav.sessions") },
+        { href: "/admin/pricing", icon: Tags, label: t("admin.nav.pricing") },
         { href: "/admin/candidates", icon: Users, label: t("admin.nav.candidates") },
         { href: "/admin/results", icon: ClipboardList, label: t("admin.nav.results") },
       ]
@@ -184,15 +185,11 @@ export default function AdminLayout({ children }) {
       label: t("admin.nav.accounting"), 
       roles: ["SUPER_ADMIN", "ACCOUNTANT", "COMPTABLE", "SECRETARY"] 
     },
-    {
-      type: 'group',
-      id: 'comm',
-      label: t("admin.nav.communication"),
-      icon: MessageSquare,
-      items: [
-        { href: "/admin/messages", icon: MessageSquare, label: t("admin.nav.messaging") },
-        { href: "/admin/help", icon: HelpCircle, label: t("admin.nav.help") },
-      ]
+    { 
+      type: 'item', 
+      href: "/admin/messages", 
+      icon: MessageSquare, 
+      label: t("admin.nav.messaging") 
     },
     {
       type: 'group',
@@ -296,11 +293,19 @@ export default function AdminLayout({ children }) {
           )}
         </div>
         
+        <NavItem
+          href="/admin/help"
+          icon={HelpCircle}
+          label={t("admin.nav.help")}
+          isActive={pathname === "/admin/help"}
+          isCollapsed={isCollapsedMode}
+        />
+
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
           title={t("nav.logout")}
           className={cn(
-            "w-full flex items-center justify-center gap-2 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors font-medium text-sm mb-2",
+            "w-full flex items-center justify-center gap-2 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors font-medium text-sm mb-2 mt-2",
             isCollapsedMode && "px-0"
           )}
         >

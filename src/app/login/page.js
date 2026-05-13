@@ -85,7 +85,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex justify-between items-center px-1">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("auth.passwordLabel")}</label>
-                <button type="button" className="text-[10px] font-bold text-[#003366] hover:underline uppercase tracking-tighter">{t("auth.forgotPassword")}</button>
+                <Link href="/forgot-password" className="text-[10px] font-bold text-[#003366] hover:underline uppercase tracking-tighter">{t("auth.forgotPassword")}</Link>
               </div>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#003366] transition-colors">

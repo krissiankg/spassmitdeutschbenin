@@ -32,11 +32,6 @@ export default function SettingsPage() {
   const [sessions, setSessions] = useState([]);
   const [selectedSessionForEmails, setSelectedSessionForEmails] = useState("");
   
-  const [pricings, setPricings] = useState([]);
-  const [editingPricing, setEditingPricing] = useState(null);
-  const [pricingForm, setPricingForm] = useState({ label: "", price: 0, category: "MODULE", code: "", level: "A1" });
-  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
-
   const [stats, setStats] = useState(null);
   const [lmsStats, setLmsStats] = useState({ total: 0, withoutAccess: 0 });
   
@@ -62,7 +57,6 @@ export default function SettingsPage() {
   const TABS = [
     { id: "profile", label: "Mon Profil", icon: User, roles: ["SUPER_ADMIN", "SECRETARY", "ACCOUNTANT", "COMPTABLE"], group: "Personnel" },
     { id: "users", label: "Gestion des Rôles", icon: Users, roles: ["SUPER_ADMIN"], group: "Administration" },
-    { id: "pricing", label: "Tarifs & Finances", icon: CreditCard, roles: ["SUPER_ADMIN", "ACCOUNTANT", "COMPTABLE"], group: "Administration" },
     { id: "communications", label: "Outils d'Envoi Mail", icon: Send, roles: ["SUPER_ADMIN", "SECRETARY"], group: "Système" },
     { id: "lms", label: "Accès LMS Étudiants", icon: Lock, roles: ["SUPER_ADMIN", "SECRETARY"], group: "Système" },
     { id: "audit", label: "Journal d'Audit", icon: History, roles: ["SUPER_ADMIN"], group: "Sécurité" },
@@ -85,13 +79,6 @@ export default function SettingsPage() {
     } catch (e) { console.error(e); }
   }, []);
 
-  const loadPricings = React.useCallback(async () => {
-    if (!isAccountant) return;
-    try {
-      const res = await fetch("/api/admin/pricing");
-      if (res.ok) setPricings(await res.json());
-    } catch (e) { console.error(e); }
-  }, [isAccountant]);
 
   const loadStats = React.useCallback(async () => {
     if (!isAccountant) return;
@@ -133,14 +120,13 @@ export default function SettingsPage() {
        loadAuditLogs();
     }
     if (isAccountant) {
-       loadPricings();
        loadStats();
     }
     if (isSecretary) {
       loadLmsStats();
     }
     loadSessions();
-  }, [session, isSuperAdmin, isAccountant, isSecretary, auditPage, auditLimit, auditActionFilter, loadUsers, loadPricings, loadAuditLogs, loadSessions, loadStats, loadLmsStats]);
+  }, [session, isSuperAdmin, isAccountant, isSecretary, auditPage, auditLimit, auditActionFilter, loadUsers, loadAuditLogs, loadSessions, loadStats, loadLmsStats]);
 
   const handleCleanupLogs = async () => {
     const months = 2;
@@ -164,37 +150,6 @@ export default function SettingsPage() {
     finally { setLoading(false); }
   };
 
-  const handleUpdatePrice = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/pricing", {
-        method: editingPricing ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingPricing ? { ...pricingForm, id: editingPricing } : pricingForm)
-      });
-      if (res.ok) {
-        toast.success(editingPricing ? "Tarif mis à jour" : "Tarif créé");
-        setEditingPricing(null);
-        setIsPricingModalOpen(false);
-        loadPricings();
-      } else {
-        toast.error("Erreur de modification");
-      }
-    } catch (err) { toast.error("Erreur réseau"); }
-    finally { setLoading(false); }
-  };
-
-  const deletePricing = async (id) => {
-    if (!confirm("Supprimer ce tarif ?")) return;
-    try {
-      const res = await fetch(`/api/admin/pricing?id=${id}`, { method: "DELETE" });
-      if (res.ok) {
-        toast.success("Tarif supprimé");
-        loadPricings();
-      }
-    } catch (e) { toast.error("Erreur réseau"); }
-  };
 
   // Profile Update
   const handleProfileUpdate = async (e) => {
@@ -514,118 +469,8 @@ export default function SettingsPage() {
                      ))}
                    </tbody>
                  </table>
-               </div>
-             </div>
-          )}
-
-          {activeTab === "pricing" && isAccountant && (
-            <div className="space-y-6">
-              {/* Stats Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white dark:bg-[#121212] p-6 rounded-3xl border border-gray-50 dark:border-gray-800/50 shadow-sm">
-                  <div className="flex items-center gap-3 text-emerald-600 mb-2">
-                    <TrendingUp size={20} />
-                    <span className="text-xs font-bold uppercase tracking-wider">Reçu Total</span>
-                  </div>
-                  <div className="text-2xl font-black text-[#003366] dark:text-white">
-                    {stats?.totalReceived?.toLocaleString('fr-FR')} <span className="text-sm font-bold opacity-40">FCFA</span>
-                  </div>
-                  <div className="text-[10px] text-gray-400 mt-1">Sur {stats?.totalCandidates} candidats enregistrés</div>
-                </div>
-                <div className="bg-white dark:bg-[#121212] p-6 rounded-3xl border border-gray-50 dark:border-gray-800/50 shadow-sm">
-                  <div className="flex items-center gap-3 text-amber-600 mb-2">
-                    <BarChart3 size={20} />
-                    <span className="text-xs font-bold uppercase tracking-wider">En Attente</span>
-                  </div>
-                  <div className="text-2xl font-black text-[#003366] dark:text-white">
-                    {stats?.totalOutstanding?.toLocaleString('fr-FR')} <span className="text-sm font-bold opacity-40">FCFA</span>
-                  </div>
-                  <div className="text-[10px] text-gray-400 mt-1">Montant restant à recouvrer</div>
-                </div>
-                <div className="bg-white dark:bg-[#121212] p-6 rounded-3xl border border-gray-50 dark:border-gray-800/50 shadow-sm">
-                  <div className="flex items-center gap-3 text-blue-600 mb-2">
-                    <LayoutDashboard size={20} />
-                    <span className="text-xs font-bold uppercase tracking-wider">Taux de Paiement</span>
-                  </div>
-                  <div className="text-2xl font-black text-[#003366] dark:text-white">
-                    {stats?.totalExpected ? Math.round((stats.totalReceived / stats.totalExpected) * 100) : 0}%
-                  </div>
-                  <div className="text-[10px] text-gray-400 mt-1">Global sur l&apos;ensemble de la base</div>
                 </div>
               </div>
-
-              {/* Pricing List */}
-              <div className="bg-white dark:bg-[#121212] rounded-3xl p-8 shadow-sm border border-gray-50 dark:border-gray-800/50">
-                <div className="flex justify-between items-center mb-8">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">Catalogue des Tarifs</h2>
-                    <p className="text-sm text-gray-400 dark:text-gray-500">Configurez les prix des modules, cours et frais annexes.</p>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      setEditingPricing(null);
-                      setPricingForm({ label: "", price: 0, category: "MODULE", code: "", level: "A1" });
-                      setIsPricingModalOpen(true);
-                    }}
-                    className="px-4 py-2 bg-[#003366] text-white rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#002244] transition-all"
-                  >
-                    <Plus size={16}/> Ajouter
-                  </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className="border-b border-gray-100 dark:border-gray-800 text-[10px] uppercase font-bold text-gray-400 tracking-wider">
-                        <th className="pb-3">Libellé</th>
-                        <th className="pb-3">Catégorie</th>
-                        <th className="pb-3">Niveau</th>
-                        <th className="pb-3">Prix (FCFA)</th>
-                        <th className="pb-3 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-                      {pricings.map(p => (
-                        <tr key={p.id} className="hover:bg-gray-50/50 dark:hover:bg-[#1A1A1A] transition-colors group">
-                          <td className="py-4">
-                            <div className="flex flex-col">
-                              <span className="font-bold text-gray-800 dark:text-gray-200">{p.label}</span>
-                              <span className="text-[10px] text-gray-400 font-mono uppercase">{p.code}</span>
-                            </div>
-                          </td>
-                          <td className="py-4">
-                            <span className="text-xs font-bold text-gray-500">{p.category}</span>
-                          </td>
-                          <td className="py-4">
-                            <span className="text-xs font-bold text-[#003366] dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded uppercase">{p.level || 'Tous'}</span>
-                          </td>
-                          <td className="py-4">
-                            <span className="font-black text-emerald-600">{p.price.toLocaleString('fr-FR')}</span>
-                          </td>
-                          <td className="py-4 text-right">
-                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button 
-                                onClick={() => {
-                                  setEditingPricing(p.id);
-                                  setPricingForm({ label: p.label, price: p.price, category: p.category, code: p.code, level: p.level || "A1" });
-                                  setIsPricingModalOpen(true);
-                                }}
-                                className="p-2 text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100"
-                              >
-                                <Edit2 size={14}/>
-                              </button>
-                              <button onClick={() => deletePricing(p.id)} className="p-2 text-red-600 bg-red-50 dark:bg-red-900/20 rounded-lg hover:bg-red-100">
-                                <Trash2 size={14}/>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
           )}
 
           {activeTab === "communications" && isSecretary && (
@@ -932,57 +777,6 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
-
-      {/* Pricing Modal */}
-      {isPricingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 dark:bg-black/80 backdrop-blur-sm" onClick={() => setIsPricingModalOpen(false)}></div>
-          <div className="relative bg-white dark:bg-[#121212] rounded-3xl shadow-2xl p-8 w-full max-w-md animate-in fade-in zoom-in duration-200">
-             <h3 className="text-xl font-bold text-[#003366] dark:text-gray-100 mb-6">{editingPricing ? "Modifier le Tarif" : "Nouveau Tarif"}</h3>
-             <form onSubmit={handleUpdatePrice} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Libellé</label>
-                    <input required type="text" value={pricingForm.label} onChange={e => setPricingForm({...pricingForm, label: e.target.value})} className="w-full px-4 py-3 bg-gray-50 dark:bg-[#1E1E1E] border border-gray-100 dark:border-gray-800 rounded-xl dark:text-white" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Code Technique</label>
-                    <input required type="text" value={pricingForm.code} onChange={e => setPricingForm({...pricingForm, code: e.target.value})} className="w-full px-4 py-3 bg-gray-50 dark:bg-[#1E1E1E] border border-gray-100 dark:border-gray-800 rounded-xl dark:text-white" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Prix (FCFA)</label>
-                    <input required type="number" value={pricingForm.price} onChange={e => setPricingForm({...pricingForm, price: e.target.value})} className="w-full px-4 py-3 bg-gray-50 dark:bg-[#1E1E1E] border border-gray-100 dark:border-gray-800 rounded-xl dark:text-white" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Catégorie</label>
-                    <select value={pricingForm.category} onChange={e => setPricingForm({...pricingForm, category: e.target.value})} className="w-full px-4 py-3 bg-gray-50 dark:bg-[#1E1E1E] border border-gray-100 dark:border-gray-800 rounded-xl dark:text-white">
-                      <option value="MODULE">Module</option>
-                      <option value="PREP_COURSE">Cours de Préparation</option>
-                      <option value="OTHER">Autre</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Niveau</label>
-                    <select value={pricingForm.level} onChange={e => setPricingForm({...pricingForm, level: e.target.value})} className="w-full px-4 py-3 bg-gray-50 dark:bg-[#1E1E1E] border border-gray-100 dark:border-gray-800 rounded-xl dark:text-white">
-                      <option value="A1">A1</option>
-                      <option value="A2">A2</option>
-                      <option value="B1">B1</option>
-                      <option value="B2">B2</option>
-                      <option value="C1">C1</option>
-                      <option value="GLOBAL">Global</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="pt-4 flex justify-end gap-3">
-                  <button type="button" onClick={() => setIsPricingModalOpen(false)} className="px-4 py-2 text-sm font-bold text-gray-500">Annuler</button>
-                  <button type="submit" disabled={loading} className="px-6 py-2 text-sm font-bold text-white bg-[#003366] rounded-xl hover:bg-[#002244] transition-all">
-                    {loading ? "Envoi..." : "Valider"}
-                  </button>
-                </div>
-             </form>
-          </div>
-        </div>
-      )}
 
       {/* User Modal */}
       {isUserModalOpen && (

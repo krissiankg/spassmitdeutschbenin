@@ -161,6 +161,8 @@ model Admin {
   email    String @unique
   password String
   role     String @default("SECRETARY") // SUPER_ADMIN, SECRETARY, ACCOUNTANT
+  resetToken       String?  @unique
+  resetTokenExpiry DateTime?
 
   // Messagerie
   participants     Participant[]
@@ -332,4 +334,20 @@ model FriendRequest {
   updatedAt   DateTime  @updatedAt
 
   @@unique([senderId, receiverId])
+}
+
+// ----------------------------------------------------
+// SYSTEME DE DOCUMENTATION (HELP CENTER)
+// ----------------------------------------------------
+
+model Tutorial {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  category    String   @default("GENERAL") // GENERAL, SECRETARY, ACCOUNTING, COMMUNICATION, SECURITY
+  content     Json     @default("[]") // Array of { title: string, description: string, imageUrl: string }
+  isPublished Boolean  @default(false)
+  authorEmail String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -372,6 +372,7 @@
       "configuration": "Configuration",
       "formBuilder": "Formulaire (Form Builder)",
       "settings": "Paramètres du Système",
+      "pricing": "Tarifs des Examens",
       "menuTitle": "Menu Principal",
       "userDefault": "Utilisateur",
       "roles": {
@@ -468,7 +469,8 @@
         "secretary": "Secrétariat",
         "accounting": "Comptabilité",
         "communication": "Communication",
-        "security": "Sécurité"
+        "security": "Sécurité",
+        "tutorials": "Tutoriels"
       },
       "sections": {
         "presentation": {
@@ -523,6 +525,22 @@
           "rbacDesc": "Les droits sont restreints selon le rôle : Super Admin (tout), Comptable (finance), Secrétaire (notes/candidats).",
           "twoFactor": "Double Authentification (2FA)",
           "twoFactorDesc": "Activez le 2FA dans vos paramètres pour sécuriser l'accès à votre compte administratif."
+        },
+        "tutorials": {
+          "title": "Guides & Tutoriels Interactifs",
+          "noteEntry": {
+            "title": "Tutoriel 1 : Comment enregistrer une note ?",
+            "desc": "Suivez ce guide pour saisir les résultats des examens ÖSD sans erreur.",
+            "step1": "Accès à la Gestion",
+            "step1Desc": "Sur la page de connexion, descendez tout en bas et cliquez sur 'Accéder à l'interface de gestion'.",
+            "step2": "Authentification",
+            "step2Desc": "Renseignez vos identifiants personnels. Vous serez redirigé vers le tableau de bord.",
+            "step3": "Menu Examen ÖSD",
+            "step3Desc": "Dans le menu de gauche, sélectionnez 'Examen ÖSD' puis l'option 'Saisie de notes'.",
+            "step4": "Enregistrement final",
+            "step4Desc": "Saisissez les notes par module pour chaque candidat et cliquez sur le bouton bleu 'Tout enregistrer' en haut à droite.",
+            "footer": "Ce tutoriel est terminé. Pour toute question, contactez le support technique."
+          }
         },
         "footer": {
           "title": "Encore des questions ?",

@@ -361,6 +361,7 @@
       "messaging": "Nachrichten",
       "formBuilder": "Formular-Builder",
       "settings": "Einstellungen",
+      "pricing": "Prüfungsgebühren",
       "help": "Hilfe-Center",
       "menuTitle": "Hauptmenü",
       "userDefault": "Benutzer",
@@ -457,7 +458,8 @@
         "secretary": "Sekretariat",
         "accounting": "Buchhaltung",
         "communication": "Kommunikation",
-        "security": "Sicherheit"
+        "security": "Sicherheit",
+        "tutorials": "Tutorials"
       },
       "sections": {
         "presentation": {
@@ -511,6 +513,22 @@
           "rbacDesc": "Rechte sind nach Rolle eingeschränkt: Super-Admin (alles), Buchhalter (Finanzen), Sekretär (Noten/Kandidaten).",
           "twoFactor": "Zwei-Faktor-Authentifizierung (2FA)",
           "twoFactorDesc": "Aktivieren Sie 2FA in Ihren Einstellungen, um den Zugriff auf Ihr Admin-Konto zu sichern."
+        },
+        "tutorials": {
+          "title": "Interaktive Leitfäden & Tutorials",
+          "noteEntry": {
+            "title": "Tutorial 1: Wie man eine Note einträgt?",
+            "desc": "Folgen Sie diesem Leitfaden, um ÖSD-Prüfungsergebnisse fehlerfrei einzugeben.",
+            "step1": "Zugang zur Verwaltung",
+            "step1Desc": "Scrollen Sie auf der Login-Seite ganz nach unten und klicken Sie auf 'Zugang zur Verwaltungsoberfläche'.",
+            "step2": "Authentifizierung",
+            "step2Desc": "Geben Sie Ihre persönlichen Zugangsdaten ein. Sie werden zum Dashboard weitergeleitet.",
+            "step3": "ÖSD-Prüfungsmenü",
+            "step3Desc": "Wählen Sie im linken Menü 'ÖSD-Prüfung' und dann die Option 'Notenerfassung'.",
+            "step4": "Abschließende Erfassung",
+            "step4Desc": "Geben Sie die Noten nach Modul für jeden Kandidaten ein und klicken Sie oben rechts auf die blaue Schaltfläche 'Alle speichern'.",
+            "footer": "Dieses Tutorial ist beendet. Bei Fragen wenden Sie sich an den technischen Support."
+          }
         },
         "footer": {
           "title": "Noch Fragen?",

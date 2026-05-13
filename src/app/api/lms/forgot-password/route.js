@@ -38,7 +38,9 @@ export async function POST(req) {
       }
     });
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const appUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL 
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` 
+      : (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000");
     const resetUrl = `${appUrl}/lms/reset-password?token=${token}`;
 
     const emailSent = await sendResetPasswordEmail(email, candidate.firstName, resetUrl);
