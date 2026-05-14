@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { 
   BookOpen, 
   UserCheck, 
@@ -231,7 +232,7 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
                     <div className="aspect-video bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center overflow-hidden relative">
                       {step.imageUrl ? (
                         <>
-                          <img src={step.imageUrl} alt="Etape" className="w-full h-full object-cover" />
+                          <Image src={step.imageUrl} alt="Etape" fill className="object-cover" unoptimized />
                           <button 
                             onClick={() => handleStepChange(index, "imageUrl", "")}
                             className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-all"
@@ -242,7 +243,7 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
                       ) : (
                         <div className="text-center p-4">
                           <Upload className="mx-auto mb-2 text-gray-400" size={32} />
-                          <p className="text-xs font-black text-gray-400 uppercase">Capture d'écran</p>
+                          <p className="text-xs font-black text-gray-400 uppercase">Capture d&apos;écran</p>
                           <input 
                             type="file" 
                             accept="image/*"
@@ -327,7 +328,14 @@ const TutorialView = ({ tutorial, onClose }) => (
               </div>
               {step.imageUrl && (
                 <div className="rounded-[2rem] overflow-hidden border border-gray-100 dark:border-gray-800 shadow-xl bg-gray-100 dark:bg-gray-800">
-                  <img src={step.imageUrl} alt={step.title} className="w-full h-auto object-cover" />
+                  <Image 
+                    src={step.imageUrl} 
+                    alt={step.title} 
+                    width={1000} 
+                    height={600} 
+                    className="w-full h-auto object-cover" 
+                    unoptimized 
+                  />
                 </div>
               )}
             </div>
@@ -782,7 +790,7 @@ export default function HelpPage() {
                      <Zap className="text-[#003366] dark:text-blue-300" size={40} />
                   </div>
                   <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-2">Aucun tutoriel dynamique</h3>
-                  <p className="text-gray-500 max-w-md mx-auto">Commencez à rédiger la documentation en tant que Super Admin pour qu'elle apparaisse ici.</p>
+                  <p className="text-gray-500 max-w-md mx-auto">Commencez à rédiger la documentation en tant que Super Admin pour qu&apos;elle apparaisse ici.</p>
                </div>
             )}
           </div>
