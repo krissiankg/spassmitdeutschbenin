@@ -488,10 +488,13 @@ const TutorialView = ({ tutorial, onClose }) => {
               exit={{ scale: 0.9 }}
               className="relative max-w-[95vw] max-h-[95vh] rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center"
             >
-              <img 
+              <Image 
                 src={zoomedImage} 
                 alt="Zoomed" 
+                width={1200}
+                height={800}
                 className="w-auto h-auto max-w-[95vw] max-h-[95vh] object-contain"
+                unoptimized
               />
             </motion.div>
           </motion.div>
@@ -741,10 +744,10 @@ export default function HelpPage() {
             </span>
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-[#003366] dark:text-white tracking-tighter mb-4 leading-tight">
-            Centre d'Aide & Tutoriels
+            Centre d&apos;Aide & Tutoriels
           </h1>
           <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl font-medium">
-            Guides complets et tutoriels interactifs pour maîtriser votre plateforme de gestion d'examens.
+            Guides complets et tutoriels interactifs pour maîtriser votre plateforme de gestion d&apos;examens.
           </p>
         </div>
       </div>
@@ -819,7 +822,7 @@ export default function HelpPage() {
                    <Zap className="text-[#003366] dark:text-blue-300" size={40} />
                 </div>
                 <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-2">Aucun tutoriel dynamique</h3>
-                <p className="text-gray-500 max-w-md mx-auto font-medium">Commencez à rédiger la documentation en tant que Super Admin pour qu'elle apparaisse ici.</p>
+                <p className="text-gray-500 max-w-md mx-auto font-medium">Commencez à rédiger la documentation en tant que Super Admin pour qu&apos;elle apparaisse ici.</p>
              </div>
           )}
         </div>
