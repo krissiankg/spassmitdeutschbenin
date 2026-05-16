@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { recordAuditLog } from "@/lib/audit";
+import { createAdminNotification } from "@/lib/notifications";
 
 export async function PUT(request, { params }) {
   try {
@@ -13,6 +14,11 @@ export async function PUT(request, { params }) {
     const { id } = params;
     const body = await request.json();
 
+    const existingTutorial = await prisma.tutorial.findUnique({ where: { id } });
+    if (!existingTutorial) {
+      return NextResponse.json({ error: "Tutorial not found" }, { status: 404 });
+    }
+
     const tutorial = await prisma.tutorial.update({
       where: { id },
       data: {
@@ -23,6 +29,14 @@ export async function PUT(request, { params }) {
         isPublished: body.isPublished
       }
     });
+
+    if (!existingTutorial.isPublished && tutorial.isPublished) {
+      await createAdminNotification({
+        title: "Nouveau tutoriel disponible",
+        message: `Le tutoriel "${tutorial.title}" vient d'être publié.`,
+        type: "SUCCESS"
+      });
+    }
 
     await recordAuditLog({
       session,

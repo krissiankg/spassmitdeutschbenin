@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthSession } from "@/lib/auth";
 import { recordAuditLog } from "@/lib/audit";
+import { createAdminNotification } from "@/lib/notifications";
 
 export const dynamic = 'force-dynamic';
 
@@ -58,6 +59,14 @@ export async function POST(request) {
         authorEmail: session.user.email
       }
     });
+
+    if (tutorial.isPublished) {
+      await createAdminNotification({
+        title: "Nouveau tutoriel disponible",
+        message: `Le tutoriel "${tutorial.title}" vient d'être publié.`,
+        type: "SUCCESS"
+      });
+    }
 
     await recordAuditLog({
       session,
