@@ -20,8 +20,9 @@ export async function POST(req) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique filename
-    const filename = `${Date.now()}-${file.name.replaceAll(" ", "_")}`;
+    // Create unique sanitized filename
+    const sanitizedName = file.name ? file.name.replace(/[^a-zA-Z0-9.]/g, "_") : "upload.png";
+    const filename = `${Date.now()}-${sanitizedName}`;
     const uploadDir = path.join(process.cwd(), "public", "uploads", "messages");
 
     // Ensure directory exists
@@ -46,3 +47,4 @@ export async function POST(req) {
     return NextResponse.json({ error: "Erreur lors de l'upload" }, { status: 500 });
   }
 }
+

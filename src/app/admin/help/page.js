@@ -108,9 +108,12 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
   };
 
   const handleStepChange = (index, field, value) => {
-    const newContent = [...formData.content];
-    newContent[index][field] = value;
-    setFormData({ ...formData, content: newContent });
+    setFormData(prev => {
+      const newContent = prev.content.map((step, i) => 
+        i === index ? { ...step, [field]: value } : step
+      );
+      return { ...prev, content: newContent };
+    });
   };
 
   const handleImageUpload = async (index, file) => {
@@ -120,13 +123,15 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
       const data = new FormData();
       data.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: data });
+      if (!res.ok) throw new Error("Upload failed");
       const result = await res.json();
       if (result.url) {
         handleStepChange(index, "imageUrl", result.url);
-        toast.success("Image téléchargée");
+        toast.success("Image téléchargée avec succès");
       }
     } catch (error) {
-      toast.error("Erreur d'upload");
+      console.error("Upload error:", error);
+      toast.error("Erreur lors de l'upload de l'image");
     } finally {
       setIsUploading(false);
     }
@@ -247,7 +252,13 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
                           <input 
                             type="file" 
                             accept="image/*"
-                            onChange={(e) => handleImageUpload(index, e.target.files[0])}
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                handleImageUpload(index, file);
+                                e.target.value = '';
+                              }
+                            }}
                             className="absolute inset-0 opacity-0 cursor-pointer"
                             disabled={isUploading}
                           />
@@ -264,25 +275,28 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-8 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-8 border-t border-gray-100 dark:border-gray-800 gap-6">
            <label className="flex items-center gap-3 cursor-pointer group">
               <input 
                 type="checkbox" 
                 checked={formData.isPublished}
-                onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
-                className="w-6 h-6 rounded-lg text-[#003366] focus:ring-[#003366] border-gray-300 transition-all"
+                onChange={(e) => setFormData(prev => ({ ...prev, isPublished: e.target.checked }))}
+                className="w-6 h-6 rounded-lg text-[#003366] focus:ring-[#003366] border-gray-300 transition-all cursor-pointer"
               />
-              <span className="font-bold text-gray-600 dark:text-gray-400 group-hover:text-[#003366] transition-colors">Rendre ce tutoriel public</span>
+              <div>
+                <span className="font-bold text-gray-700 dark:text-gray-300 group-hover:text-[#003366] dark:group-hover:text-[#D4AF37] transition-colors block">Publier immédiatement ce tutoriel</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 block">Si décoché, le tutoriel sera enregistré comme brouillon modifiable ultérieurement.</span>
+              </div>
            </label>
-           <div className="flex gap-4">
-              <button onClick={onCancel} className="px-10 py-5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-[1.5rem] font-black text-lg hover:bg-gray-200 transition-all">
+           <div className="flex gap-4 w-full sm:w-auto justify-end">
+              <button onClick={onCancel} className="px-8 py-4 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-[1.5rem] font-black text-base hover:bg-gray-200 transition-all">
                 Annuler
               </button>
               <button 
                 onClick={() => onSave(formData)}
-                className="flex items-center gap-3 px-10 py-5 bg-[#003366] text-white rounded-[1.5rem] font-black text-lg hover:scale-105 transition-all shadow-xl shadow-blue-900/20"
+                className={`flex items-center justify-center gap-3 px-8 py-4 text-white rounded-[1.5rem] font-black text-base hover:scale-105 transition-all shadow-xl ${formData.isPublished ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-900/20' : 'bg-[#003366] hover:bg-[#002244] shadow-blue-900/20'}`}
               >
-                <Save size={24} /> {tutorial ? "Mettre à jour" : "Créer le Tutoriel"}
+                <Save size={20} /> {tutorial ? (formData.isPublished ? "Mettre à jour et Publier" : "Mettre à jour le Brouillon") : (formData.isPublished ? "Créer et Publier" : "Enregistrer comme Brouillon")}
               </button>
            </div>
         </div>
@@ -419,7 +433,8 @@ export default function HelpPage() {
   const fetchTutorials = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/admin/tutorials?category=${activeTab.toUpperCase()}`);
+      const categoryParam = activeTab === "tutorials" ? "ALL" : activeTab.toUpperCase();
+      const res = await fetch(`/api/admin/tutorials?category=${categoryParam}`);
       if (res.ok) {
         const data = await res.json();
         setTutorials(data);
@@ -728,17 +743,17 @@ export default function HelpPage() {
           </div>
         )}
 
+        <AnimatePresence>
+           {viewingTutorial && (
+              <TutorialView 
+                tutorial={viewingTutorial} 
+                onClose={() => setViewingTutorial(null)} 
+              />
+           )}
+        </AnimatePresence>
+
         {activeTab === "tutorials" && (
           <div className="space-y-12">
-            <AnimatePresence>
-               {viewingTutorial && (
-                  <TutorialView 
-                    tutorial={viewingTutorial} 
-                    onClose={() => setViewingTutorial(null)} 
-                  />
-               )}
-            </AnimatePresence>
-
             {isSuperAdmin && (
                <div className="flex items-center justify-between mb-12">
                   <div>
@@ -790,10 +805,43 @@ export default function HelpPage() {
                      <Zap className="text-[#003366] dark:text-blue-300" size={40} />
                   </div>
                   <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-2">Aucun tutoriel dynamique</h3>
-                  <p className="text-gray-500 max-w-md mx-auto">Commencez à rédiger la documentation en tant que Super Admin pour qu&apos;elle apparaisse ici.</p>
+                  <p className="text-gray-500 max-w-md mx-auto font-medium">Commencez à rédiger la documentation en tant que Super Admin pour qu&apos;elle apparaisse ici.</p>
                </div>
             )}
           </div>
+        )}
+
+        {activeTab !== "tutorials" && (
+           <div className="pt-12 border-t border-gray-100 dark:border-gray-800 mt-12 space-y-8 animate-in fade-in duration-500">
+             <h3 className="text-2xl font-black text-[#003366] dark:text-[#D4AF37] flex items-center gap-3">
+               <Zap size={24} /> Tutoriels Dynamiques - {tabs.find(t => t.id === activeTab)?.label}
+             </h3>
+             {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-50">
+                   {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="h-64 bg-gray-100 dark:bg-gray-800 rounded-[2.5rem] animate-pulse" />
+                   ))}
+                </div>
+             ) : tutorials.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+                   {tutorials.map((tutorial) => (
+                      <TutorialCard 
+                         key={tutorial.id}
+                         tutorial={tutorial}
+                         isAdmin={isSuperAdmin}
+                         onEdit={(t) => { setEditingTutorial(t); setShowEditor(true); setActiveTab("tutorials"); }}
+                         onDelete={handleDeleteTutorial}
+                         onTogglePublish={handleTogglePublish}
+                         onView={setViewingTutorial}
+                      />
+                   ))}
+                </div>
+             ) : (
+                <div className="text-center py-12 bg-gray-50 dark:bg-gray-900/40 rounded-[3rem] border border-dashed border-gray-200 dark:border-gray-800">
+                   <p className="text-gray-500 font-medium">Aucun tutoriel dynamique disponible pour cette catégorie.</p>
+                </div>
+             )}
+           </div>
         )}
       </div>
 
