@@ -365,6 +365,76 @@ const TutorialView = ({ tutorial, onClose }) => (
   </motion.div>
 );
 
+const ConfirmDeleteModal = ({ isOpen, title, onConfirm, onCancel, isDeleting }) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/60 dark:bg-black/80 backdrop-blur-md"
+      >
+        <motion.div 
+          initial={{ scale: 0.9, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
+          exit={{ scale: 0.9, y: 20 }}
+          className="bg-white dark:bg-[#1A1A1A] w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl border border-gray-100 dark:border-gray-800 relative overflow-hidden"
+        >
+          {/* Accent glow */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-red-500/10 dark:bg-red-500/20 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="flex flex-col items-center text-center space-y-6 relative z-10">
+            <motion.div 
+              initial={{ scale: 0 }}
+              animate={{ scale: 1, rotate: [0, -10, 10, -10, 0] }}
+              transition={{ duration: 0.5, type: "spring" }}
+              className="w-20 h-20 rounded-full bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center border-8 border-red-100/50 dark:border-red-500/20 shadow-xl shadow-red-500/10"
+            >
+              <Trash2 size={36} />
+            </motion.div>
+
+            <div className="space-y-2">
+              <h3 className="text-2xl font-black text-[#003366] dark:text-white tracking-tight">Supprimer la documentation</h3>
+              <p className="text-gray-600 dark:text-gray-400 font-medium text-base leading-relaxed">
+                Êtes-vous sûr de vouloir supprimer définitivement le tutoriel <span className="font-bold text-gray-900 dark:text-white">&ldquo;{title}&rdquo;</span> ? Cette action est irréversible.
+              </p>
+            </div>
+
+            <div className="flex gap-4 w-full pt-4 border-t border-gray-100 dark:border-gray-800/80">
+              <button 
+                onClick={onCancel}
+                disabled={isDeleting}
+                className="flex-1 py-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-2xl font-black text-base hover:bg-gray-200 dark:hover:bg-gray-700 transition-all disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button 
+                onClick={onConfirm}
+                disabled={isDeleting}
+                className="flex-1 flex items-center justify-center gap-2 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black text-base transition-all shadow-lg shadow-red-600/20 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Suppression...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={18} />
+                    Supprimer
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
 const TutorialCard = ({ tutorial, isAdmin, onEdit, onDelete, onTogglePublish, onView }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -400,7 +470,7 @@ const TutorialCard = ({ tutorial, isAdmin, onEdit, onDelete, onTogglePublish, on
              <button onClick={() => onTogglePublish(tutorial)} className={`p-2.5 transition-all rounded-xl ${tutorial.isPublished ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-400'}`}>
                 {tutorial.isPublished ? <Eye size={18} /> : <Lock size={18} />}
              </button>
-             <button onClick={() => onDelete(tutorial.id)} className="p-2.5 bg-red-50 text-red-400 hover:text-red-600 transition-all rounded-xl">
+             <button onClick={() => onDelete(tutorial)} className="p-2.5 bg-red-50 text-red-400 hover:text-red-600 transition-all rounded-xl">
                 <Trash2 size={18} />
              </button>
           </div>
@@ -450,16 +520,29 @@ export default function HelpPage() {
     fetchTutorials();
   }, [fetchTutorials]);
 
-  const handleDeleteTutorial = async (id) => {
-    if (!confirm("Voulez-vous vraiment supprimer ce tutoriel ?")) return;
+  const [deleteModalData, setDeleteModalData] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const confirmDelete = (tutorial) => {
+    setDeleteModalData({ id: tutorial.id, title: tutorial.title });
+  };
+
+  const executeDelete = async () => {
+    if (!deleteModalData) return;
     try {
-      const res = await fetch(`/api/admin/tutorials/${id}`, { method: "DELETE" });
+      setIsDeleting(true);
+      const res = await fetch(`/api/admin/tutorials/${deleteModalData.id}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("Tutoriel supprimé");
+        toast.success("Tutoriel supprimé avec succès");
+        setDeleteModalData(null);
         fetchTutorials();
+      } else {
+        toast.error("Erreur lors de la suppression");
       }
     } catch (error) {
-      toast.error("Erreur de suppression");
+      toast.error("Erreur réseau");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -752,6 +835,14 @@ export default function HelpPage() {
            )}
         </AnimatePresence>
 
+        <ConfirmDeleteModal 
+          isOpen={!!deleteModalData}
+          title={deleteModalData?.title}
+          onConfirm={executeDelete}
+          onCancel={() => setDeleteModalData(null)}
+          isDeleting={isDeleting}
+        />
+
         {activeTab === "tutorials" && (
           <div className="space-y-12">
             {isSuperAdmin && (
@@ -793,7 +884,7 @@ export default function HelpPage() {
                         tutorial={tutorial}
                         isAdmin={isSuperAdmin}
                         onEdit={(t) => { setEditingTutorial(t); setShowEditor(true); }}
-                        onDelete={handleDeleteTutorial}
+                        onDelete={confirmDelete}
                         onTogglePublish={handleTogglePublish}
                         onView={setViewingTutorial}
                      />
@@ -830,7 +921,7 @@ export default function HelpPage() {
                          tutorial={tutorial}
                          isAdmin={isSuperAdmin}
                          onEdit={(t) => { setEditingTutorial(t); setShowEditor(true); setActiveTab("tutorials"); }}
-                         onDelete={handleDeleteTutorial}
+                         onDelete={confirmDelete}
                          onTogglePublish={handleTogglePublish}
                          onView={setViewingTutorial}
                       />
