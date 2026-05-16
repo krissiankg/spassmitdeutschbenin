@@ -37,6 +37,21 @@ import { useTranslations } from "@/hooks/useTranslations";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 
+const renderFormattedText = (text) => {
+  if (!text) return null;
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} className="font-black text-gray-900 dark:text-white">{part.slice(2, -2)}</strong>;
+        }
+        return <span key={i}>{part.split('\n').map((line, j) => <React.Fragment key={`${i}-${j}`}>{line}{j < part.split('\n').length - 1 && <br />}</React.Fragment>)}</span>;
+      })}
+    </>
+  );
+};
+
 const HelpSection = ({ title, icon: Icon, children }) => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
@@ -261,6 +276,9 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
             className="w-full px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-[#003366] transition-all font-medium h-24"
             placeholder="Une brève description pour présenter le guide..."
           />
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 ml-1 flex items-center gap-1.5 font-medium">
+            <Info size={14} className="text-[#003366] dark:text-[#D4AF37]" /> Astuce : Entourez votre texte de ** pour le mettre en gras (ex: **texte important**).
+          </p>
         </div>
 
         <div className="space-y-6">
@@ -302,6 +320,9 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
                       className="w-full p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-[#003366] h-32"
                       placeholder="Instructions détaillées..."
                     />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 ml-1 flex items-center gap-1.5 font-medium">
+                      <Info size={14} className="text-[#003366] dark:text-[#D4AF37]" /> Astuce : Entourez votre texte de ** pour le mettre en gras (ex: **texte important**).
+                    </p>
                   </div>
                   <div className="space-y-4">
                     <div className="aspect-video bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center overflow-hidden relative">
@@ -400,7 +421,7 @@ const TutorialView = ({ tutorial, onClose }) => {
               {tutorial.category}
             </span>
             <h2 className="text-4xl font-black text-[#003366] dark:text-white mb-4 tracking-tight uppercase">{tutorial.title}</h2>
-            <p className="text-xl text-gray-500 font-medium mb-12">{tutorial.description}</p>
+            <p className="text-xl text-gray-500 font-medium mb-12">{renderFormattedText(tutorial.description)}</p>
             
             <div className="space-y-20">
               {tutorial.content.map((step, index) => (
@@ -411,7 +432,7 @@ const TutorialView = ({ tutorial, onClose }) => {
                     </div>
                     <div className="space-y-4">
                       <h3 className="text-2xl font-black text-[#003366] dark:text-white">{step.title}</h3>
-                      <p className="text-lg text-gray-600 dark:text-gray-400 font-medium leading-relaxed">{step.description}</p>
+                      <p className="text-lg text-gray-600 dark:text-gray-400 font-medium leading-relaxed">{renderFormattedText(step.description)}</p>
                     </div>
                   </div>
                   {step.imageUrl && (
