@@ -620,15 +620,9 @@ const TutorialCard = ({ tutorial, isAdmin, onEdit, onDelete, onTogglePublish, on
         className="w-full py-4 bg-gray-50 dark:bg-gray-800 hover:bg-[#003366] hover:text-white dark:hover:bg-[#D4AF37] dark:hover:text-[#003366] transition-all rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3"
       >
         Consulter le Guide <ArrowRight size={18} />
-      </button>
-    </motion.div>
-  );
-};
-
-export default function HelpPage() {
+      </buexport default function HelpPage() {
   const { t, loaded } = useTranslations();
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState("general");
   const [tutorials, setTutorials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
@@ -639,8 +633,7 @@ export default function HelpPage() {
   const fetchTutorials = useCallback(async () => {
     try {
       setLoading(true);
-      const categoryParam = activeTab === "tutorials" ? "ALL" : activeTab.toUpperCase();
-      const res = await fetch(`/api/admin/tutorials?category=${categoryParam}`);
+      const res = await fetch(`/api/admin/tutorials?category=ALL`);
       if (res.ok) {
         const data = await res.json();
         setTutorials(data);
@@ -650,7 +643,7 @@ export default function HelpPage() {
     } finally {
       setLoading(false);
     }
-  }, [activeTab]);
+  }, []);
 
   useEffect(() => {
     fetchTutorials();
@@ -732,15 +725,6 @@ export default function HelpPage() {
     );
   }
 
-  const tabs = [
-    { id: "general", label: t("admin.help.tabs.general"), icon: BookOpen },
-    { id: "secretary", label: t("admin.help.tabs.secretary"), icon: UserCheck },
-    { id: "accounting", label: t("admin.help.tabs.accounting"), icon: CreditCard },
-    { id: "communication", label: t("admin.help.tabs.communication"), icon: MessageSquare },
-    { id: "security", label: t("admin.help.tabs.security"), icon: Shield },
-    { id: "tutorials", label: t("admin.help.tabs.tutorials"), icon: Zap },
-  ];
-
   return (
     <div className="max-w-6xl mx-auto space-y-10 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header */}
@@ -751,217 +735,16 @@ export default function HelpPage() {
               {t("admin.help.sections.adminGuideTag")}
             </span>
           </div>
-          <h1 className="text-6xl font-black text-[#003366] dark:text-white tracking-tighter mb-4">
-            {t("admin.help.title")}
+          <h1 className="text-4xl md:text-6xl font-black text-[#003366] dark:text-white tracking-tighter mb-4 leading-tight">
+            Centre d'Aide & Tutoriels
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl font-medium">
-            {t("admin.help.subtitle")}
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl font-medium">
+            Guides complets et tutoriels interactifs pour maîtriser votre plateforme de gestion d'examens.
           </p>
         </div>
       </div>
 
-      {/* Tabs Navigation */}
-      <div className="flex flex-wrap gap-3 sticky top-24 z-20 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-xl p-2 rounded-2xl border border-gray-100/50 dark:border-gray-800/50 shadow-lg shadow-black/5">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-3 px-6 py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all duration-300 ${
-              activeTab === tab.id 
-                ? "bg-[#003366] text-white shadow-xl shadow-blue-900/40 scale-105" 
-                : "bg-white dark:bg-[#1E1E1E] text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-100 dark:border-gray-700"
-            }`}
-          >
-            <tab.icon size={20} className={activeTab === tab.id ? "text-[#D4AF37]" : ""} />
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
       <div className="relative">
-        {activeTab === "general" && (
-          <div className="space-y-10">
-            <HelpSection title={t("admin.help.sections.presentation.title")} icon={BookOpen}>
-              <p className="text-xl font-medium">
-                {t("admin.help.sections.presentation.desc")}
-              </p>
-              <div className="grid md:grid-cols-2 gap-8 mt-10">
-                <FeatureCard 
-                  title={t("admin.help.sections.presentation.objective")} 
-                  desc={t("admin.help.sections.presentation.objectiveDesc")} 
-                  icon={Zap} 
-                  color="blue" 
-                />
-                <FeatureCard 
-                  title={t("admin.help.sections.presentation.security")} 
-                  desc={t("admin.help.sections.presentation.securityDesc")} 
-                  icon={Shield} 
-                  color="amber" 
-                />
-              </div>
-            </HelpSection>
-          </div>
-        )}
-
-        {activeTab === "secretary" && (
-          <div className="space-y-10">
-            <HelpSection title={t("admin.help.sections.secretary.title")} icon={UserCheck}>
-              <div className="space-y-12">
-                <section className="relative pl-8 border-l-4 border-blue-100 dark:border-blue-900">
-                  <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-4 flex items-center gap-3">
-                    <Calendar size={24} /> {t("admin.help.sections.secretary.sessions")}
-                  </h3>
-                  <p className="text-gray-700 dark:text-gray-300 font-medium mb-6">{t("admin.help.sections.secretary.sessionsDesc")}</p>
-                  <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 flex items-center gap-4">
-                    <Info className="text-[#003366] dark:text-[#D4AF37]" />
-                    <p className="text-sm font-bold uppercase tracking-wide">{t("payments.draftVsPublished")}</p>
-                  </div>
-                </section>
-
-                <section className="relative pl-8 border-l-4 border-blue-100 dark:border-blue-900">
-                  <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-6 flex items-center gap-3">
-                    <Users size={24} /> {t("admin.help.sections.secretary.candidates")}
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <Step number="1" title={t("admin.help.sections.secretary.modeIndividual")} description={t("admin.help.sections.secretary.modeIndividualDesc")} />
-                    <Step number="2" title={t("admin.help.sections.secretary.modeImport")} description={t("admin.help.sections.secretary.modeImportDesc")} />
-                  </div>
-                </section>
-
-                <section className="relative pl-8 border-l-4 border-blue-100 dark:border-blue-900">
-                  <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-4 flex items-center gap-3">
-                    <Mail size={24} /> {t("admin.help.sections.secretary.credentials")}
-                  </h3>
-                  <p className="text-gray-700 dark:text-gray-300 font-medium mb-6">{t("admin.help.sections.secretary.credentialsDesc")}</p>
-                </section>
-
-                <div className="p-10 bg-gradient-to-br from-[#003366] to-[#002244] text-white rounded-[3rem] shadow-2xl relative overflow-hidden">
-                  <div className="absolute -right-10 -bottom-10 opacity-10 rotate-12 scale-150"><ClipboardList size={200}/></div>
-                  <h3 className="text-3xl font-black mb-6 flex items-center gap-4">
-                    <Shield size={32} className="text-[#D4AF37]" /> {t("admin.help.sections.secretary.results")}
-                  </h3>
-                  <p className="text-lg text-blue-100/90 mb-8 max-w-2xl">
-                    {t("admin.help.sections.secretary.resultsDesc")}
-                  </p>
-                  <div className="flex flex-wrap gap-4">
-                    <span className="px-5 py-3 bg-white/10 rounded-2xl border border-white/20 text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-                      <CheckCircle size={16} className="text-emerald-400" /> {t("payments.autoEmail")}
-                    </span>
-                    <span className="px-5 py-3 bg-white/10 rounded-2xl border border-white/20 text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-                      <CheckCircle size={16} className="text-emerald-400" /> {t("payments.portalAccess")}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </HelpSection>
-          </div>
-        )}
-
-        {activeTab === "accounting" && (
-          <div className="space-y-10">
-            <HelpSection title={t("admin.help.sections.accounting.title")} icon={CreditCard}>
-              <div className="space-y-12">
-                <section>
-                  <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-6 flex items-center gap-3">
-                    {t("admin.help.sections.accounting.flows")}
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <FeatureCard 
-                      title={t("admin.help.sections.accounting.status")} 
-                      desc={t("admin.help.sections.accounting.statusDesc")} 
-                      icon={PieChart} 
-                      color="emerald" 
-                    />
-                    <FeatureCard 
-                      title={t("admin.help.sections.accounting.receipts")} 
-                      desc={t("admin.help.sections.accounting.receiptsDesc")} 
-                      icon={FileText} 
-                      color="blue" 
-                    />
-                  </div>
-                </section>
-
-                <section className="bg-gray-50 dark:bg-gray-800/50 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700">
-                  <h4 className="font-black text-2xl text-[#003366] dark:text-[#D4AF37] mb-4 flex items-center gap-3">
-                    <Zap size={24} /> {t("admin.help.sections.accounting.pricing")}
-                  </h4>
-                  <p className="mb-6 font-medium">{t("admin.help.sections.accounting.pricingDesc")}</p>
-                  <div className="flex items-center gap-4 text-sm font-bold text-gray-500">
-                    <ArrowRight size={16} /> {t("payments.pricingNotice")}
-                  </div>
-                </section>
-
-                <section className="relative pl-8 border-l-4 border-emerald-100 dark:border-emerald-900">
-                  <h3 className="text-2xl font-black text-emerald-800 dark:text-emerald-400 mb-4">
-                    {t("admin.help.sections.accounting.dashboard")}
-                  </h3>
-                  <p className="text-gray-700 dark:text-gray-300 font-medium">{t("admin.help.sections.accounting.dashboardDesc")}</p>
-                </section>
-              </div>
-            </HelpSection>
-          </div>
-        )}
-
-        {activeTab === "communication" && (
-          <div className="space-y-10">
-            <HelpSection title={t("admin.help.sections.communication.title")} icon={MessageSquare}>
-              <div className="space-y-12">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <Step number="1" title={t("admin.help.sections.communication.chat")} description={t("admin.help.sections.communication.chatDesc")} />
-                  <Step number="2" title={t("admin.help.sections.communication.attachments")} description={t("admin.help.sections.communication.attachmentsDesc")} />
-                </div>
-                
-                <section className="bg-indigo-50 dark:bg-indigo-900/10 p-10 rounded-[3rem] border border-indigo-100 dark:border-indigo-800">
-                  <h3 className="text-2xl font-black text-indigo-800 dark:text-indigo-300 mb-4 flex items-center gap-3">
-                    <Mail size={24} /> {t("admin.help.sections.communication.notifications")}
-                  </h3>
-                  <p className="text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
-                    {t("admin.help.sections.communication.notificationsDesc")}
-                  </p>
-                </section>
-              </div>
-            </HelpSection>
-          </div>
-        )}
-
-        {activeTab === "security" && (
-          <div className="space-y-10">
-            <HelpSection title={t("admin.help.sections.security.title")} icon={Shield}>
-              <div className="space-y-12">
-                <section>
-                   <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-4">{t("admin.help.sections.security.audit")}</h3>
-                   <p className="text-lg italic text-gray-600 dark:text-gray-400 mb-8">{t("admin.help.sections.security.auditDesc")}</p>
-                   <div className="grid md:grid-cols-2 gap-8">
-                     <div className="flex gap-4 items-start p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                       <CheckCircle className="text-emerald-500 shrink-0" size={24} />
-                       <p className="text-sm font-medium">{t("payments.auditDetail1")}</p>
-                     </div>
-                     <div className="flex gap-4 items-start p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                       <CheckCircle className="text-emerald-500 shrink-0" size={24} />
-                       <p className="text-sm font-medium">{t("payments.auditDetail2")}</p>
-                     </div>
-                   </div>
-                </section>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  <FeatureCard 
-                    title={t("admin.help.sections.security.rbac")} 
-                    desc={t("admin.help.sections.security.rbacDesc")} 
-                    icon={Lock} 
-                    color="amber" 
-                  />
-                  <FeatureCard 
-                    title={t("admin.help.sections.security.twoFactor")} 
-                    desc={t("admin.help.sections.security.twoFactorDesc")} 
-                    icon={Shield} 
-                    color="indigo" 
-                  />
-                </div>
-              </div>
-            </HelpSection>
-          </div>
-        )}
-
         <AnimatePresence>
            {viewingTutorial && (
               <TutorialView 
@@ -979,111 +762,76 @@ export default function HelpPage() {
           isDeleting={isDeleting}
         />
 
-        {activeTab === "tutorials" && (
-          <div className="space-y-12">
-            {isSuperAdmin && (
-               <div className="flex items-center justify-between mb-12">
-                  <div>
-                     <h3 className="text-2xl font-black text-[#003366] dark:text-[#D4AF37]">Gestion des Tutoriels</h3>
-                     <p className="text-gray-500 font-medium">Créez et modifiez la documentation pour votre équipe.</p>
-                  </div>
-                  {!showEditor && (
-                     <button 
-                        onClick={() => { setEditingTutorial(null); setShowEditor(true); }}
-                        className="flex items-center gap-3 px-8 py-4 bg-[#003366] text-white rounded-2xl font-black hover:scale-105 transition-all shadow-xl shadow-blue-900/20"
-                     >
-                        <Plus size={20} /> Créer une Documentation
-                     </button>
-                  )}
-               </div>
-            )}
-
-            {showEditor && isSuperAdmin && (
-               <TutorialEditor 
-                  tutorial={editingTutorial} 
-                  onSave={handleSaveTutorial} 
-                  onCancel={() => { setShowEditor(false); setEditingTutorial(null); }} 
-               />
-            )}
-
-            {loading ? (
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-50">
-                  {[1, 2, 3, 4].map(i => (
-                     <div key={i} className="h-64 bg-gray-100 dark:bg-gray-800 rounded-[2.5rem] animate-pulse" />
-                  ))}
-               </div>
-            ) : tutorials.length > 0 ? (
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-                  {tutorials.map((tutorial) => (
-                     <TutorialCard 
-                        key={tutorial.id}
-                        tutorial={tutorial}
-                        isAdmin={isSuperAdmin}
-                        onEdit={(t) => { setEditingTutorial(t); setShowEditor(true); }}
-                        onDelete={confirmDelete}
-                        onTogglePublish={handleTogglePublish}
-                        onView={setViewingTutorial}
-                     />
-                  ))}
-               </div>
-            ) : (
-               <div className="text-center py-20 bg-gray-50 dark:bg-gray-900/40 rounded-[3rem] border border-dashed border-gray-200 dark:border-gray-800">
-                  <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                     <Zap className="text-[#003366] dark:text-blue-300" size={40} />
-                  </div>
-                  <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-2">Aucun tutoriel dynamique</h3>
-                  <p className="text-gray-500 max-w-md mx-auto font-medium">Commencez à rédiger la documentation en tant que Super Admin pour qu&apos;elle apparaisse ici.</p>
-               </div>
-            )}
-          </div>
-        )}
-
-        {activeTab !== "tutorials" && (
-           <div className="pt-12 border-t border-gray-100 dark:border-gray-800 mt-12 space-y-8 animate-in fade-in duration-500">
-             <h3 className="text-2xl font-black text-[#003366] dark:text-[#D4AF37] flex items-center gap-3">
-               <Zap size={24} /> Tutoriels Dynamiques - {tabs.find(t => t.id === activeTab)?.label}
-             </h3>
-             {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-50">
-                   {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="h-64 bg-gray-100 dark:bg-gray-800 rounded-[2.5rem] animate-pulse" />
-                   ))}
+        <div className="space-y-12">
+          {isSuperAdmin && (
+             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12">
+                <div>
+                   <h3 className="text-2xl font-black text-[#003366] dark:text-[#D4AF37]">Tutoriels Dynamiques</h3>
+                   <p className="text-gray-500 font-medium">Créez et modifiez la documentation pour votre équipe.</p>
                 </div>
-             ) : tutorials.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-                   {tutorials.map((tutorial) => (
-                      <TutorialCard 
-                         key={tutorial.id}
-                         tutorial={tutorial}
-                         isAdmin={isSuperAdmin}
-                         onEdit={(t) => { setEditingTutorial(t); setShowEditor(true); setActiveTab("tutorials"); }}
-                         onDelete={confirmDelete}
-                         onTogglePublish={handleTogglePublish}
-                         onView={setViewingTutorial}
-                      />
-                   ))}
+                {!showEditor && (
+                   <button 
+                      onClick={() => { setEditingTutorial(null); setShowEditor(true); }}
+                      className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-4 bg-[#003366] text-white rounded-2xl font-black hover:scale-105 transition-all shadow-xl shadow-blue-900/20"
+                   >
+                      <Plus size={20} /> Créer une Documentation
+                   </button>
+                )}
+             </div>
+          )}
+
+          {showEditor && isSuperAdmin && (
+             <TutorialEditor 
+                tutorial={editingTutorial} 
+                onSave={handleSaveTutorial} 
+                onCancel={() => { setShowEditor(false); setEditingTutorial(null); }} 
+             />
+          )}
+
+          {loading ? (
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-50">
+                {[1, 2, 3, 4].map(i => (
+                   <div key={i} className="h-64 bg-gray-100 dark:bg-gray-800 rounded-[2.5rem] animate-pulse" />
+                ))}
+             </div>
+          ) : tutorials.length > 0 ? (
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+                {tutorials.map((tutorial) => (
+                   <TutorialCard 
+                      key={tutorial.id}
+                      tutorial={tutorial}
+                      isAdmin={isSuperAdmin}
+                      onEdit={(t) => { setEditingTutorial(t); setShowEditor(true); }}
+                      onDelete={confirmDelete}
+                      onTogglePublish={handleTogglePublish}
+                      onView={setViewingTutorial}
+                   />
+                ))}
+             </div>
+          ) : (
+             <div className="text-center py-20 bg-gray-50 dark:bg-gray-900/40 rounded-[3rem] border border-dashed border-gray-200 dark:border-gray-800 px-4">
+                <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                   <Zap className="text-[#003366] dark:text-blue-300" size={40} />
                 </div>
-             ) : (
-                <div className="text-center py-12 bg-gray-50 dark:bg-gray-900/40 rounded-[3rem] border border-dashed border-gray-200 dark:border-gray-800">
-                   <p className="text-gray-500 font-medium">Aucun tutoriel dynamique disponible pour cette catégorie.</p>
-                </div>
-             )}
-           </div>
-        )}
+                <h3 className="text-2xl font-black text-[#003366] dark:text-white mb-2">Aucun tutoriel dynamique</h3>
+                <p className="text-gray-500 max-w-md mx-auto font-medium">Commencez à rédiger la documentation en tant que Super Admin pour qu'elle apparaisse ici.</p>
+             </div>
+          )}
+        </div>
       </div>
 
       {/* FAQ Quick Link */}
-      <div className="p-12 bg-white dark:bg-[#1A1A1A] rounded-[3rem] border border-gray-100 dark:border-gray-800 text-center shadow-xl shadow-black/5">
+      <div className="p-8 md:p-12 bg-white dark:bg-[#1A1A1A] rounded-[3rem] border border-gray-100 dark:border-gray-800 text-center shadow-xl shadow-black/5 mx-4 md:mx-0">
         <HelpCircle size={48} className="mx-auto text-[#D4AF37] mb-6" />
-        <h2 className="text-3xl font-black text-[#003366] dark:text-white mb-4">{t("admin.help.sections.footer.title")}</h2>
-        <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+        <h2 className="text-2xl md:text-3xl font-black text-[#003366] dark:text-white mb-4">{t("admin.help.sections.footer.title")}</h2>
+        <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
           {t("admin.help.sections.footer.desc")}
         </p>
         <a 
           href="https://wa.me/22966368705" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="inline-block px-10 py-4 bg-[#003366] text-white rounded-2xl font-black uppercase tracking-widest hover:scale-105 transition-transform"
+          className="inline-flex w-full sm:w-auto items-center justify-center px-10 py-4 bg-[#003366] text-white rounded-2xl font-black uppercase tracking-widest hover:scale-105 transition-transform"
         >
           {t("admin.help.sections.footer.button")}
         </a>
