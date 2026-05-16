@@ -620,7 +620,12 @@ const TutorialCard = ({ tutorial, isAdmin, onEdit, onDelete, onTogglePublish, on
         className="w-full py-4 bg-gray-50 dark:bg-gray-800 hover:bg-[#003366] hover:text-white dark:hover:bg-[#D4AF37] dark:hover:text-[#003366] transition-all rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3"
       >
         Consulter le Guide <ArrowRight size={18} />
-      </buexport default function HelpPage() {
+      </button>
+    </motion.div>
+  );
+};
+
+export default function HelpPage() {
   const { t, loaded } = useTranslations();
   const { data: session } = useSession();
   const [tutorials, setTutorials] = useState([]);
