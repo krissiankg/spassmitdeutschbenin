@@ -29,7 +29,8 @@ import {
   Settings,
   MoreVertical,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Maximize2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -305,65 +306,110 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
   );
 };
 
-const TutorialView = ({ tutorial, onClose }) => (
-  <motion.div 
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm"
-  >
-    <motion.div 
-      initial={{ scale: 0.9, y: 20 }}
-      animate={{ scale: 1, y: 0 }}
-      className="bg-white dark:bg-[#121212] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative"
-    >
-      <button onClick={onClose} className="absolute top-6 right-6 p-3 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 transition-all z-10">
-        <X size={24} />
-      </button>
-      
-      <div className="p-12">
-        <span className="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-[#003366] dark:text-blue-300 rounded-full text-xs font-black uppercase tracking-widest mb-4 inline-block">
-          {tutorial.category}
-        </span>
-        <h2 className="text-4xl font-black text-[#003366] dark:text-white mb-4 tracking-tight uppercase">{tutorial.title}</h2>
-        <p className="text-xl text-gray-500 font-medium mb-12">{tutorial.description}</p>
-        
-        <div className="space-y-20">
-          {tutorial.content.map((step, index) => (
-            <div key={index} className="space-y-8">
-              <div className="flex items-start gap-6">
-                <div className="w-12 h-12 rounded-2xl bg-[#003366] text-white flex items-center justify-center font-black text-xl shrink-0">
-                  {index + 1}
+const TutorialView = ({ tutorial, onClose }) => {
+  const [zoomedImage, setZoomedImage] = useState(null);
+
+  return (
+    <>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm"
+      >
+        <motion.div 
+          initial={{ scale: 0.9, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
+          className="bg-white dark:bg-[#121212] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative"
+        >
+          <button onClick={onClose} className="absolute top-6 right-6 p-3 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 transition-all z-10">
+            <X size={24} />
+          </button>
+          
+          <div className="p-12">
+            <span className="px-4 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-[#003366] dark:text-blue-300 rounded-full text-xs font-black uppercase tracking-widest mb-4 inline-block">
+              {tutorial.category}
+            </span>
+            <h2 className="text-4xl font-black text-[#003366] dark:text-white mb-4 tracking-tight uppercase">{tutorial.title}</h2>
+            <p className="text-xl text-gray-500 font-medium mb-12">{tutorial.description}</p>
+            
+            <div className="space-y-20">
+              {tutorial.content.map((step, index) => (
+                <div key={index} className="space-y-8">
+                  <div className="flex items-start gap-6">
+                    <div className="w-12 h-12 rounded-2xl bg-[#003366] text-white flex items-center justify-center font-black text-xl shrink-0">
+                      {index + 1}
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-black text-[#003366] dark:text-white">{step.title}</h3>
+                      <p className="text-lg text-gray-600 dark:text-gray-400 font-medium leading-relaxed">{step.description}</p>
+                    </div>
+                  </div>
+                  {step.imageUrl && (
+                    <div 
+                      onClick={() => setZoomedImage(step.imageUrl)}
+                      className="rounded-[2rem] overflow-hidden border border-gray-100 dark:border-gray-800 shadow-xl bg-gray-100 dark:bg-gray-800 cursor-zoom-in group relative"
+                    >
+                      <Image 
+                        src={step.imageUrl} 
+                        alt={step.title} 
+                        width={1000} 
+                        height={600} 
+                        className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" 
+                        unoptimized 
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 duration-300">
+                        <span className="px-6 py-3 bg-white/90 dark:bg-black/90 text-[#003366] dark:text-white rounded-full font-black text-sm shadow-lg flex items-center gap-2 backdrop-blur-sm transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                          <Maximize2 size={18} /> Agrandir l&apos;image
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-black text-[#003366] dark:text-white">{step.title}</h3>
-                  <p className="text-lg text-gray-600 dark:text-gray-400 font-medium leading-relaxed">{step.description}</p>
-                </div>
-              </div>
-              {step.imageUrl && (
-                <div className="rounded-[2rem] overflow-hidden border border-gray-100 dark:border-gray-800 shadow-xl bg-gray-100 dark:bg-gray-800">
-                  <Image 
-                    src={step.imageUrl} 
-                    alt={step.title} 
-                    width={1000} 
-                    height={600} 
-                    className="w-full h-auto object-cover" 
-                    unoptimized 
-                  />
-                </div>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
-        
-        <div className="mt-20 p-10 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-[2.5rem] border border-blue-100 dark:border-blue-800 text-center">
-           <h4 className="text-xl font-black text-[#003366] dark:text-blue-200 mb-2">Besoin d&apos;assistance ?</h4>
-           <p className="text-gray-600 dark:text-gray-400 font-medium">Contactez le support technique via le chat administratif si des zones d&apos;ombre subsistent.</p>
-        </div>
-      </div>
-    </motion.div>
-  </motion.div>
-);
+            
+            <div className="mt-20 p-10 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-[2.5rem] border border-blue-100 dark:border-blue-800 text-center">
+               <h4 className="text-xl font-black text-[#003366] dark:text-blue-200 mb-2">Besoin d&apos;assistance ?</h4>
+               <p className="text-gray-600 dark:text-gray-400 font-medium">Contactez le support technique via le chat administratif si des zones d&apos;ombre subsistent.</p>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      <AnimatePresence>
+        {zoomedImage && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setZoomedImage(null)}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl cursor-zoom-out"
+          >
+            <button 
+              onClick={() => setZoomedImage(null)} 
+              className="absolute top-6 right-6 p-4 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all z-10 backdrop-blur-md"
+            >
+              <X size={28} />
+            </button>
+            <motion.div 
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="relative max-w-[95vw] max-h-[95vh] rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center"
+            >
+              <img 
+                src={zoomedImage} 
+                alt="Zoomed" 
+                className="w-auto h-auto max-w-[95vw] max-h-[95vh] object-contain"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
 
 const ConfirmDeleteModal = ({ isOpen, title, onConfirm, onCancel, isDeleting }) => {
   if (!isOpen) return null;

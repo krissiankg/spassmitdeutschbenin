@@ -1,39 +1,37 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
+import fs from "fs";
 import path from "path";
 import { getAuthSession } from "@/lib/auth";
 
-export async function POST(req) {
-  const session = await getAuthSession();
-  if (!session) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-  }
+export const dynamic = 'force-dynamic';
 
+export async function POST(req) {
   try {
+    const session = await getAuthSession();
+    if (!session) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const file = formData.get("file");
 
-    if (!file) {
+    if (!file || file.size === 0) {
       return NextResponse.json({ error: "Aucun fichier fourni" }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique sanitized filename
-    const sanitizedName = file.name ? file.name.replace(/[^a-zA-Z0-9.]/g, "_") : "upload.png";
-    const filename = `${Date.now()}-${sanitizedName}`;
+    const ext = file.name ? file.name.split('.').pop() : 'png';
+    const filename = `img_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
     const uploadDir = path.join(process.cwd(), "public", "uploads", "messages");
 
-    // Ensure directory exists
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (err) {
-      // Ignore if directory exists
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
     }
 
     const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
+    fs.writeFileSync(filePath, buffer);
 
     const fileUrl = `/uploads/messages/${filename}`;
 
