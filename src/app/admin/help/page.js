@@ -405,12 +405,14 @@ const TutorialView = ({ tutorial, onClose }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm cursor-pointer"
+        onClick={onClose}
       >
         <motion.div 
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
-          className="bg-white dark:bg-[#121212] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative"
+          className="bg-white dark:bg-[#121212] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[3rem] shadow-2xl relative cursor-default"
+          onClick={(e) => e.stopPropagation()}
         >
           <button onClick={onClose} className="absolute top-6 right-6 p-3 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 transition-all z-10">
             <X size={24} />
