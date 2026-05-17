@@ -132,7 +132,7 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
     });
   };
 
-  const compressImage = (file) => {
+  const compressImageToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -163,17 +163,8 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, width, height);
           
-          canvas.toBlob((blob) => {
-            if (blob) {
-              const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
-                type: "image/jpeg",
-                lastModified: Date.now(),
-              });
-              resolve(compressedFile);
-            } else {
-              reject(new Error("Canvas to Blob failed"));
-            }
-          }, "image/jpeg", 0.8);
+          const base64String = canvas.toDataURL("image/jpeg", 0.7);
+          resolve(base64String);
         };
         img.onerror = (err) => reject(err);
       };
@@ -186,34 +177,15 @@ const TutorialEditor = ({ tutorial, onSave, onCancel }) => {
     try {
       setIsUploading(true);
       
-      let fileToUpload = file;
-      if (file.type.startsWith('image/')) {
-        try {
-          fileToUpload = await compressImage(file);
-        } catch (e) {
-          console.error("Compression failed, using original file", e);
-        }
+      if (!file.type.startsWith('image/')) {
+         toast.error("Le fichier doit être une image");
+         return;
       }
 
-      const data = new FormData();
-      data.append("file", fileToUpload);
+      const base64Image = await compressImageToBase64(file);
+      handleStepChange(index, "imageUrl", base64Image);
+      toast.success("Image ajoutée avec succès");
       
-      const res = await fetch("/api/upload", { method: "POST", body: data });
-      
-      if (!res.ok) {
-        let errorMsg = `Erreur HTTP: ${res.status}`;
-        try {
-          const errData = await res.json();
-          if (errData.error) errorMsg = errData.error;
-        } catch(e) {}
-        throw new Error(errorMsg);
-      }
-      
-      const result = await res.json();
-      if (result.url) {
-        handleStepChange(index, "imageUrl", result.url);
-        toast.success("Image téléchargée avec succès");
-      }
     } catch (error) {
       console.error("Upload error:", error);
       toast.error(`Erreur: ${error.message || "inconnue"}`);
