@@ -120,12 +120,13 @@ export default function CandidatesPage() {
         consultationCode: candidate.consultationCode || "",
         level: candidate.level || "A1",
         sessionId: candidate.sessionId || "",
-        customData: candidate.customData || {}
+        customData: candidate.customData || {},
+        documentUrl: candidate.documentUrl || ""
       });
     } else {
       setEditingCandidateId(null);
       setCandidateForm({
-        firstName: "", lastName: "", email: "", candidateNumber: "", consultationCode: "", level: "A1", sessionId: "", customData: {}
+        firstName: "", lastName: "", email: "", candidateNumber: "", consultationCode: "", level: "A1", sessionId: "", customData: {}, documentUrl: ""
       });
     }
     setIsEditModalOpen(true);
@@ -592,11 +593,23 @@ export default function CandidatesPage() {
                           </div>
                           <div className="flex flex-col">
                             <span className="font-bold text-[#003366] dark:text-gray-100 text-sm">{candidate.firstName} {candidate.lastName}</span>
-                            {incomplete && (
-                              <span className="text-[10px] text-orange-500 dark:text-orange-400 font-semibold flex items-center gap-1">
-                                <AlertTriangle size={10} /> Manque : {missing.join(', ')}
-                              </span>
-                            )}
+                            <div className="flex items-center flex-wrap gap-2 mt-1">
+                              {candidate.documentUrl && (
+                                <a
+                                  href={candidate.documentUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[10px] text-amber-600 hover:text-amber-800 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-900/50"
+                                >
+                                  📄 Pièce d&apos;identité
+                                </a>
+                              )}
+                              {incomplete && (
+                                <span className="text-[10px] text-orange-500 dark:text-orange-400 font-semibold flex items-center gap-1">
+                                  <AlertTriangle size={10} /> Manque : {missing.join(', ')}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -847,6 +860,23 @@ export default function CandidatesPage() {
                     {dbSessions.map(s => <option key={s.id} value={s.id}>{s.title} ({s.level})</option>)}
                   </select>
                 </div>
+
+                {candidateForm.documentUrl && (
+                  <div className="sm:col-span-2 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-xl border border-amber-200 dark:border-amber-900/50 flex items-center justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1">Pièce d&apos;Identité Officielle</h4>
+                      <p className="text-xs text-amber-700 dark:text-amber-500/80">Document d&apos;identité officiel transmis par le candidat.</p>
+                    </div>
+                    <a
+                      href={candidateForm.documentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-md shadow-amber-600/10 transition-colors"
+                    >
+                      Voir le Document 📄
+                    </a>
+                  </div>
+                )}
 
                 {/* Custom Fields render in Modal */}
                 {customFields.length > 0 && (

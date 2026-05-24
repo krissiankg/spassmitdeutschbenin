@@ -15,7 +15,7 @@ export async function GET() {
     const activeSessions = await prisma.session.findMany({
       where: {
         id: { in: settings.activeSessions },
-        status: "PUBLISHED"
+        status: { not: "ARCHIVED" }
       },
       orderBy: { date: 'desc' }
     });

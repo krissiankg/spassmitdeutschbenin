@@ -55,6 +55,13 @@ export default function RegisterOsdPage() {
   const toggleMod = code => setSelectedModules(p => p.includes(code) ? p.filter(x => x !== code) : [...p, code]);
   const togglePrep = code => setSelectedPrepCourses(p => p.includes(code) ? p.filter(x => x !== code) : [...p, code]);
 
+  const fileToBase64 = (f) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(f);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = e => reject(e);
+  });
+
   const handleSubmit = async e => {
     e.preventDefault();
     if (!formData.firstName || !formData.lastName || !formData.sessionId) return toast.error("Champs obligatoires manquants");
@@ -62,20 +69,36 @@ export default function RegisterOsdPage() {
     if (!selectedModules.length) return toast.error("Choisissez au moins un module");
     if (!file) return toast.error("Importez votre pièce d'identité");
     setLoading(true);
-    const data = new FormData();
-    Object.keys(formData).forEach(k => data.append(k, formData[k] || ""));
-    data.append("document", file);
-    data.append("selectedLevels", JSON.stringify(selectedLevels));
-    data.append("selectedModules", JSON.stringify(selectedModules));
-    data.append("selectedPrepCourses", JSON.stringify(selectedPrepCourses));
-    data.append("customData", JSON.stringify(customData));
-    data.append("formType", formType);
-    Object.keys(customFiles).forEach(id => { if (customFiles[id]) data.append(`customFile_${id}`, customFiles[id]); });
+
     try {
+      const documentBase64 = await fileToBase64(file);
+
+      const base64CustomFiles = {};
+      for (const id of Object.keys(customFiles)) {
+        if (customFiles[id]) {
+          base64CustomFiles[id] = await fileToBase64(customFiles[id]);
+        }
+      }
+
+      const data = new FormData();
+      Object.keys(formData).forEach(k => data.append(k, formData[k] || ""));
+      data.append("document", documentBase64);
+      data.append("selectedLevels", JSON.stringify(selectedLevels));
+      data.append("selectedModules", JSON.stringify(selectedModules));
+      data.append("selectedPrepCourses", JSON.stringify(selectedPrepCourses));
+      
+      const finalCustomData = { ...customData, ...base64CustomFiles };
+      data.append("customData", JSON.stringify(finalCustomData));
+      
+      data.append("formType", formType);
+
       const res = await fetch("/api/register", { method: "POST", body: data });
       if (res.ok) setSuccess(true);
       else { const err = await res.json(); toast.error(err.error || "Erreur"); }
-    } catch { toast.error("Erreur réseau"); } finally { setLoading(false); }
+    } catch (err) { 
+      console.error(err);
+      toast.error("Erreur lors de la préparation des fichiers ou erreur réseau"); 
+    } finally { setLoading(false); }
   };
 
   if (success) return (

@@ -54,39 +54,65 @@ export async function POST(req) {
 
     // Handle document upload once for all candidates
     let documentUrl = null;
-    if (documentFile && documentFile.size > 0 && typeof documentFile.arrayBuffer === 'function') {
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'documents');
-      if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+    if (documentFile) {
+      if (typeof documentFile === 'string' && documentFile.startsWith('data:')) {
+        documentUrl = documentFile;
+      } else if (documentFile.size > 0 && typeof documentFile.arrayBuffer === 'function') {
+        try {
+          const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'documents');
+          if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
-      const fileExtension = documentFile.name.split('.').pop() || 'tmp';
-      const fileName = `doc_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
-      const filePath = path.join(uploadsDir, fileName);
+          const fileExtension = documentFile.name.split('.').pop() || 'tmp';
+          const fileName = `doc_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+          const filePath = path.join(uploadsDir, fileName);
 
-      const arrayBuffer = await documentFile.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      
-      fs.writeFileSync(filePath, buffer);
-      documentUrl = `/uploads/documents/${fileName}`;
+          const arrayBuffer = await documentFile.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          
+          fs.writeFileSync(filePath, buffer);
+          documentUrl = `/uploads/documents/${fileName}`;
+        } catch (fileErr) {
+          console.error("Local file system write failed, falling back to Base64:", fileErr);
+          const arrayBuffer = await documentFile.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          const mimeType = documentFile.type || "application/octet-stream";
+          documentUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
+        }
+      }
     }
 
     // Handle dynamic custom files
-    const uploadsDirCustom = path.join(process.cwd(), 'public', 'uploads', 'custom');
-    if (!fs.existsSync(uploadsDirCustom)) fs.mkdirSync(uploadsDirCustom, { recursive: true });
-
     for (const key of formData.keys()) {
       if (key.startsWith('customFile_')) {
         const fieldId = key.replace('customFile_', '');
         const cFile = formData.get(key);
-        if (cFile && cFile.size > 0 && typeof cFile.arrayBuffer === 'function') {
-          const ext = cFile.name.split('.').pop() || 'tmp';
-          const cFileName = `custom_${fieldId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
-          const cFilePath = path.join(uploadsDirCustom, cFileName);
-          
-          const arrBuffer = await cFile.arrayBuffer();
-          fs.writeFileSync(cFilePath, Buffer.from(arrBuffer));
-          
-          if (!customData) customData = {};
-          customData[fieldId] = `/uploads/custom/${cFileName}`;
+        if (cFile) {
+          if (typeof cFile === 'string' && cFile.startsWith('data:')) {
+            if (!customData) customData = {};
+            customData[fieldId] = cFile;
+          } else if (cFile.size > 0 && typeof cFile.arrayBuffer === 'function') {
+            try {
+              const uploadsDirCustom = path.join(process.cwd(), 'public', 'uploads', 'custom');
+              if (!fs.existsSync(uploadsDirCustom)) fs.mkdirSync(uploadsDirCustom, { recursive: true });
+
+              const ext = cFile.name.split('.').pop() || 'tmp';
+              const cFileName = `custom_${fieldId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+              const cFilePath = path.join(uploadsDirCustom, cFileName);
+              
+              const arrBuffer = await cFile.arrayBuffer();
+              fs.writeFileSync(cFilePath, Buffer.from(arrBuffer));
+              
+              if (!customData) customData = {};
+              customData[fieldId] = `/uploads/custom/${cFileName}`;
+            } catch (fileErr) {
+              console.error("Local custom file write failed, falling back to Base64:", fileErr);
+              const arrBuffer = await cFile.arrayBuffer();
+              const buffer = Buffer.from(arrBuffer);
+              const mimeType = cFile.type || "application/octet-stream";
+              if (!customData) customData = {};
+              customData[fieldId] = `data:${mimeType};base64,${buffer.toString('base64')}`;
+            }
+          }
         }
       }
     }
