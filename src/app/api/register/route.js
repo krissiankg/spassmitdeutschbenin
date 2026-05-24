@@ -101,7 +101,27 @@ export async function POST(req) {
     // Let's attach the total basket size only on the first dossier? Or calculate the true cost of just that level.
     // Easiest is to calculate the cost matching the level.
     
-    let candidateSequenceCounter = await prisma.candidate.count();
+    // Trouver le numéro de candidat le plus élevé en base de données pour éviter les collisions en cas de suppressions
+    let lastNumber = 0;
+    const lastCandidate = await prisma.candidate.findFirst({
+      where: {
+        candidateNumber: {
+          startsWith: "SMD-"
+        }
+      },
+      orderBy: {
+        candidateNumber: 'desc'
+      },
+      select: {
+        candidateNumber: true
+      }
+    });
+    if (lastCandidate) {
+      const match = lastCandidate.candidateNumber.match(/SMD-(\d+)/);
+      if (match) {
+        lastNumber = parseInt(match[1], 10);
+      }
+    }
     const { sendRegistrationEmail } = await import("@/lib/email");
     const bcrypt = await import("bcryptjs");
 
@@ -131,9 +151,20 @@ export async function POST(req) {
        lvlModules.forEach(code => partialTotal += pricings.find(p => p.code === code)?.price || 0);
        lvlCourses.forEach(code => partialTotal += pricings.find(p => p.code === code)?.price || 0);
 
-       candidateSequenceCounter++;
-       const candidateNumber = `SMD-${candidateSequenceCounter.toString().padStart(6, '0')}`;
-       const consultationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+       lastNumber++;
+       const candidateNumber = `SMD-${lastNumber.toString().padStart(6, '0')}`;
+       
+       let consultationCode = "";
+       let isCodeUnique = false;
+       while (!isCodeUnique) {
+         consultationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+         const existing = await prisma.candidate.findUnique({
+           where: { consultationCode }
+         });
+         if (!existing) {
+           isCodeUnique = true;
+         }
+       }
 
        const c = await prisma.candidate.create({
          data: {
