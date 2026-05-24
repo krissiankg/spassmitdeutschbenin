@@ -448,7 +448,11 @@
       "successSessionCreated": "Sitzung erfolgreich erstellt!",
       "successSessionUpdated": "Sitzung erfolgreich geändert!",
       "errorSessionSave": "Fehler beim Speichern der Sitzung",
-      "loadingSessions": "Laden der Sitzungen..."
+      "loadingSessions": "Laden der Sitzungen...",
+      "deleteConfirm": "Sind Sie sicher, dass Sie diese Sitzung löschen möchten? Diese Aktion ist dauerhaft und löscht alle zugehörigen Daten.",
+      "deletingInProgress": "Löschen läuft...",
+      "deleteSuccess": "Sitzung erfolgreich gelöscht!",
+      "errorDelete": "Fehler beim Löschen der Sitzung"
     },
     "help": {
       "title": "Admin Hilfe-Center",

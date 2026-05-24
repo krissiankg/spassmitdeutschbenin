@@ -20,6 +20,7 @@ import {
 import { formatDate } from "@/lib/utils";
 import { toast } from "react-hot-toast";
 import { useTranslations } from "@/hooks/useTranslations";
+import { useSession } from "next-auth/react";
 
 const StatusBadge = ({ status, t }) => {
   const styles = {
@@ -36,6 +37,9 @@ const StatusBadge = ({ status, t }) => {
 
 export default function SessionsPage() {
   const { t, loaded } = useTranslations();
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
+
   const [viewMode, setViewMode] = useState("list");
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -150,6 +154,29 @@ export default function SessionsPage() {
         setSessions(prev => prev.map(s => s.id === id ? { ...s, status: "PUBLISHED" } : s));
       } else {
         toast.error(data.error || t("admin.sessions.errorPublish"), { id: toastId });
+      }
+    } catch (error) {
+      toast.error(t("admin.dashboard.errorNetwork"), { id: toastId });
+    }
+  };
+
+  const handleDeleteSession = async (id) => {
+    if (!confirm(t("admin.sessions.deleteConfirm"))) {
+      return;
+    }
+
+    const toastId = toast.loading(t("admin.sessions.deletingInProgress"));
+    try {
+      const res = await fetch(`/api/admin/sessions/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(t("admin.sessions.deleteSuccess"), { id: toastId });
+        setSessions(prev => prev.filter(s => s.id !== id));
+      } else {
+        toast.error(data.error || t("admin.sessions.errorDelete"), { id: toastId });
       }
     } catch (error) {
       toast.error(t("admin.dashboard.errorNetwork"), { id: toastId });
@@ -345,6 +372,14 @@ export default function SessionsPage() {
                         className="p-2 text-gray-400 dark:text-gray-500 hover:text-amber-600 hover:bg-amber-50 dark:bg-amber-900/20 rounded-lg transition-colors">
                         <Calendar size={16} />
                       </button>
+                      {isSuperAdmin && (
+                        <button 
+                          onClick={() => handleDeleteSession(session.id)}
+                          title="Supprimer la session"
+                          className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors">
+                          <Trash2 size={16} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -404,6 +439,14 @@ export default function SessionsPage() {
                     className="flex-1 py-2 bg-amber-500 text-white rounded-xl text-xs font-bold hover:bg-amber-600 transition-colors shadow-lg shadow-amber-900/10 flex items-center justify-center gap-1">
                     <Calendar size={14} /> Calendrier
                   </button>
+                  {isSuperAdmin && (
+                    <button 
+                      onClick={() => handleDeleteSession(session.id)}
+                      title="Supprimer"
+                      className="p-2 bg-red-50 dark:bg-red-900/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-xl transition-colors flex items-center justify-center">
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

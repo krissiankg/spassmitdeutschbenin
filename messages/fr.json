@@ -459,7 +459,11 @@
       "successSessionCreated": "Session créée avec succès !",
       "successSessionUpdated": "Session modifiée avec succès !",
       "errorSessionSave": "Erreur lors de l'enregistrement de la session",
-      "loadingSessions": "Chargement des sessions..."
+      "loadingSessions": "Chargement des sessions...",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette session ? Cette action est définitive et supprimera toutes les données associées.",
+      "deletingInProgress": "Suppression en cours...",
+      "deleteSuccess": "Session supprimée avec succès !",
+      "errorDelete": "Erreur lors de la suppression de la session"
     },
     "help": {
       "title": "Centre d'Aide Admin",

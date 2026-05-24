@@ -65,7 +65,63 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "Session introuvable" }, { status: 404 });
     }
 
-    await prisma.session.delete({ where: { id } });
+    // Suppression en cascade des données dépendantes
+    await prisma.$transaction([
+      prisma.moduleScore.deleteMany({
+        where: {
+          result: {
+            sessionId: id
+          }
+        }
+      }),
+      prisma.result.deleteMany({
+        where: {
+          sessionId: id
+        }
+      }),
+      prisma.payment.deleteMany({
+        where: {
+          candidate: {
+            sessionId: id
+          }
+        }
+      }),
+      prisma.notification.deleteMany({
+        where: {
+          recipientCandidate: {
+            sessionId: id
+          }
+        }
+      }),
+      prisma.participant.deleteMany({
+        where: {
+          candidate: {
+            sessionId: id
+          }
+        }
+      }),
+      prisma.friendRequest.deleteMany({
+        where: {
+          OR: [
+            { sender: { sessionId: id } },
+            { receiver: { sessionId: id } }
+          ]
+        }
+      }),
+      prisma.candidate.deleteMany({
+        where: {
+          sessionId: id
+        }
+      }),
+      prisma.examSchedule.deleteMany({
+        where: {
+          sessionId: id
+        }
+      }),
+      prisma.session.delete({
+        where: { id }
+      })
+    ]);
 
     await recordAuditLog({
       session: sessionAuth,

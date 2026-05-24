@@ -172,6 +172,7 @@ export async function POST(req) {
     // Créer des notifications dans le tableau de bord pour TOUS les admins
     try {
       const { createAdminNotification } = await import("@/lib/notifications");
+      const levelsTitle = selectedLevels.join(', ');
       await createAdminNotification({
         title: "Nouvelle pré-inscription " + (selectedLevels.length > 1 ? "Multi-Niveaux" : ""),
         message: `${firstName} ${lastName} vient de s'inscrire pour : ${levelsTitle}.`,

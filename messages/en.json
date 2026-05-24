@@ -448,7 +448,11 @@
       "successSessionCreated": "Session created successfully!",
       "successSessionUpdated": "Session updated successfully!",
       "errorSessionSave": "Error saving session",
-      "loadingSessions": "Loading sessions..."
+      "loadingSessions": "Loading sessions...",
+      "deleteConfirm": "Are you sure you want to delete this session? This action is permanent and will delete all associated data.",
+      "deletingInProgress": "Deleting in progress...",
+      "deleteSuccess": "Session deleted successfully!",
+      "errorDelete": "Error while deleting the session"
     },
     "help": {
       "title": "Admin Help Center",
