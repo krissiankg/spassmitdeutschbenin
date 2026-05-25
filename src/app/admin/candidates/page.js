@@ -55,14 +55,14 @@ export default function CandidatesPage() {
         win.document.write(`
           <html>
             <head>
-              <title>\${title}</title>
+              <title>${title}</title>
               <style>
                 body { margin:0; display:flex; justify-content:center; align-items:center; background:#1e1e1e; min-height:100vh; font-family:system-ui, sans-serif; }
                 img { max-width:95%; max-height:95vh; object-fit:contain; box-shadow:0 10px 30px rgba(0,0,0,0.5); border-radius:8px; }
               </style>
             </head>
             <body>
-              <img src="\${url}" alt="\${title}" />
+              <img src="${url}" alt="${title}" />
             </body>
           </html>
         `);
@@ -70,14 +70,14 @@ export default function CandidatesPage() {
         win.document.write(`
           <html>
             <head>
-              <title>\${title}</title>
+              <title>${title}</title>
               <style>
                 body { margin:0; height:100vh; background:#333; }
                 iframe { border:none; width:100%; height:100%; }
               </style>
             </head>
             <body>
-              <iframe src="\${url}"></iframe>
+              <iframe src="${url}"></iframe>
             </body>
           </html>
         `);
@@ -89,8 +89,8 @@ export default function CandidatesPage() {
               <p style="font-family:sans-serif; text-align:center; margin-top:50px;">Téléchargement en cours...</p>
               <script>
                 const a = document.createElement('a');
-                a.href = "\${url}";
-                a.download = "\${title}";
+                a.href = "${url}";
+                a.download = "${title}";
                 document.body.appendChild(a);
                 a.click();
                 window.close();
