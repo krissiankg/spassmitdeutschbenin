@@ -39,6 +39,71 @@ export default function CandidatesPage() {
 
   const fileInputRef = useRef(null);
 
+  const handleViewDocument = (e, url, title = "Document") => {
+    e.preventDefault();
+    if (!url) return;
+    if (url.startsWith('data:')) {
+      const win = window.open();
+      if (!win) {
+        toast.error("Veuillez autoriser les popups pour visualiser ce document.");
+        return;
+      }
+      const mimeType = url.substring(url.indexOf(':') + 1, url.indexOf(';'));
+      win.document.title = title;
+      
+      if (mimeType.startsWith('image/')) {
+        win.document.write(`
+          <html>
+            <head>
+              <title>\${title}</title>
+              <style>
+                body { margin:0; display:flex; justify-content:center; align-items:center; background:#1e1e1e; min-height:100vh; font-family:system-ui, sans-serif; }
+                img { max-width:95%; max-height:95vh; object-fit:contain; box-shadow:0 10px 30px rgba(0,0,0,0.5); border-radius:8px; }
+              </style>
+            </head>
+            <body>
+              <img src="\${url}" alt="\${title}" />
+            </body>
+          </html>
+        `);
+      } else if (mimeType === 'application/pdf') {
+        win.document.write(`
+          <html>
+            <head>
+              <title>\${title}</title>
+              <style>
+                body { margin:0; height:100vh; background:#333; }
+                iframe { border:none; width:100%; height:100%; }
+              </style>
+            </head>
+            <body>
+              <iframe src="\${url}"></iframe>
+            </body>
+          </html>
+        `);
+      } else {
+        win.document.write(`
+          <html>
+            <head><title>Téléchargement...</title></head>
+            <body>
+              <p style="font-family:sans-serif; text-align:center; margin-top:50px;">Téléchargement en cours...</p>
+              <script>
+                const a = document.createElement('a');
+                a.href = "\${url}";
+                a.download = "\${title}";
+                document.body.appendChild(a);
+                a.click();
+                window.close();
+              </script>
+            </body>
+          </html>
+        `);
+      }
+    } else {
+      window.open(url, '_blank');
+    }
+  };
+
   const loadCandidates = React.useCallback(async () => {
     setLoading(true);
     try {
@@ -595,14 +660,13 @@ export default function CandidatesPage() {
                             <span className="font-bold text-[#003366] dark:text-gray-100 text-sm">{candidate.firstName} {candidate.lastName}</span>
                             <div className="flex items-center flex-wrap gap-2 mt-1">
                               {candidate.documentUrl && (
-                                <a
-                                  href={candidate.documentUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-[10px] text-amber-600 hover:text-amber-800 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-900/50"
+                                <button
+                                  type="button"
+                                  onClick={(e) => handleViewDocument(e, candidate.documentUrl, `Piece_Identite_${candidate.firstName}_${candidate.lastName}`)}
+                                  className="inline-flex items-center gap-1 text-[10px] text-amber-600 hover:text-amber-800 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-900/50 cursor-pointer"
                                 >
                                   📄 Pièce d&apos;identité
-                                </a>
+                                </button>
                               )}
                               {incomplete && (
                                 <span className="text-[10px] text-orange-500 dark:text-orange-400 font-semibold flex items-center gap-1">
@@ -867,14 +931,13 @@ export default function CandidatesPage() {
                       <h4 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1">Pièce d&apos;Identité Officielle</h4>
                       <p className="text-xs text-amber-700 dark:text-amber-500/80">Document d&apos;identité officiel transmis par le candidat.</p>
                     </div>
-                    <a
-                      href={candidateForm.documentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-md shadow-amber-600/10 transition-colors"
+                    <button
+                      type="button"
+                      onClick={(e) => handleViewDocument(e, candidateForm.documentUrl, `Piece_Identite_${candidateForm.firstName}_${candidateForm.lastName}`)}
+                      className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-md shadow-amber-600/10 transition-colors cursor-pointer"
                     >
                       Voir le Document 📄
-                    </a>
+                    </button>
                   </div>
                 )}
 
@@ -899,9 +962,13 @@ export default function CandidatesPage() {
                         {f.type === 'FILE' && (
                           <div className="mt-2 text-sm text-[#003366] font-medium p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center justify-between">
                             {candidateForm.customData?.[f.id] ? (
-                              <a href={candidateForm.customData[f.id]} target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-blue-800">
+                              <button
+                                type="button"
+                                onClick={(e) => handleViewDocument(e, candidateForm.customData[f.id], `Fichier_${f.label}`)}
+                                className="underline font-bold hover:text-blue-800 cursor-pointer text-left"
+                              >
                                 Voir le Document 📄
-                              </a>
+                              </button>
                             ) : (
                               <span className="text-gray-400 italic">Aucun fichier transmis</span>
                             )}
